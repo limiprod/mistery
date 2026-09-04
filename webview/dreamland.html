@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Dreamland — O País dos Sonhos 🌈</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    overflow: hidden;
+    background: #ffd6e8;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', cursive, sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  canvas { display: block; margin: 0 auto; image-rendering: -webkit-optimize-contrast; }
+  #hud {
+    position: fixed; top: 14px; left: 14px; right: 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    pointer-events: none; z-index: 10; gap: 12px; flex-wrap: wrap;
+  }
+  .hud-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(6px);
+    padding: 8px 18px; border-radius: 30px;
+    border: 2px solid rgba(255,255,255,0.9);
+    font-size: 18px; font-weight: bold;
+    color: #6b3a8c;
+    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.25);
+  }
+  #title { font-size: 24px; }
+  #message {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.97);
+    padding: 30px 40px;
+    border-radius: 30px;
+    text-align: center;
+    box-shadow: 0 14px 50px rgba(255, 107, 157, 0.4);
+    border: 4px solid #ffafd4;
+    z-index: 20;
+    max-width: 560px;
+  }
+  #message h1 {
+    color: #ff5e9c; font-size: 34px; margin-bottom: 14px;
+    text-shadow: 2px 2px 0 #ffd6e8;
+  }
+  #message p { color: #6b3a8c; font-size: 17px; line-height: 1.6; margin-bottom: 8px; }
+  #msg-button {
+    margin-top: 18px; padding: 12px 36px;
+    background: linear-gradient(135deg, #ff6b9d, #c084fc);
+    color: white; border: none; border-radius: 25px;
+    font-size: 20px; font-weight: bold; cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 5px 0 #b0457a, 0 8px 20px rgba(192, 132, 252, 0.4);
+    transition: transform 0.1s;
+  }
+  #msg-button:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b0457a; }
+  #msg-button:active { transform: translateY(3px); box-shadow: 0 2px 0 #b0457a; }
+  .controls {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: rgba(255,255,255,0.7);
+    padding: 8px 22px; border-radius: 22px;
+    color: #6b3a8c; font-size: 14px;
+    pointer-events: none; z-index: 10;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    border: 2px solid rgba(255,255,255,0.9);
+    white-space: nowrap;
+  }
+  .key {
+    display: inline-block; padding: 2px 8px; background: white;
+    border-radius: 6px; border: 1px solid #d8b4e2;
+    font-weight: bold; color: #ff5e9c; margin: 0 2px;
+    box-shadow: 0 2px 0 #d8b4e2;
+  }
+  .prompt {
+    position: fixed; left: 50%; top: 65%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.92);
+    color: #6b3a8c; font-size: 18px; font-weight: bold;
+    padding: 10px 22px; border-radius: 20px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    z-index: 5;
+    animation: bob 1.2s ease-in-out infinite;
+    pointer-events: none;
+    border: 2px solid #ffafd4;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-6px); }
+  }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<canvas id="game" width="1280" height="720"></canvas>
+<div id="hud">
+  <div class="hud-pill" id="title">🌈 Dreamland ✨</div>
+  <div style="display:flex; gap:10px; flex-wrap: wrap;">
+    <div class="hud-pill">⭐ <span id="stars">0</span></div>
+    <div class="hud-pill">🌸 <span id="flowers">0</span></div>
+    <div class="hud-pill">☁️ <span id="clouds">0</span></div>
+  </div>
+</div>
+<div id="prompt" class="prompt hidden"></div>
+<div class="controls">
+  <span class="key">←</span> <span class="key">→</span> mover &nbsp;
+  <span class="key">↑</span>/<span class="key">Espaço</span> saltar &nbsp;
+  <span class="key">E</span> interagir &nbsp;
+  <span class="key">R</span> recomeçar &nbsp;
+  <span class="key">X</span> sair
+</div>
+<div id="message">
+  <h1 id="msg-title">🌈 Bem-vindo ao Dreamland!</h1>
+  <p id="msg-text">Um país mágico onde podes <b>escorregar em arco-íris</b>, <b>mergulhar numa piscina de flores</b> e <b>voar num unicórnio</b> por entre as nuvens.</p>
+  <p style="font-size:14px; color:#999;">Usa as setas para mover, Espaço para saltar, E para interagir.</p>
+  <button id="msg-button">Começar a aventura ✨</button>
+</div>
+<script>
+'use strict';
+
+// ====================================================================
+//  DREAMLAND — sliding on rainbows, swimming in flower pools,
+//  and flying on unicorns above the clouds.
+// ====================================================================
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width;   // 1280
+const H = canvas.height;  // 720
+
+// ---------- Audio (musiquinha de caixa de música) ----------
+let audioCtx = null;
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+function note(freq, dur, type = 'sine', vol = 0.07, when = 0) {
+  if (!audioCtx) return;
+  const t = audioCtx.currentTime + when;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = type; osc.frequency.value = freq;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.connect(g); g.connect(audioCtx.destination);
+  osc.start(t); osc.stop(t + dur);
+}
+function sfx(name) {
+  ensureAudio();
+  if (name === 'star') {
+    note(1320, 0.12, 'sine', 0.08);
+    note(1760, 0.15, 'sine', 0.06, 0.05);
+  } else if (name === 'flower') {
+    note(880, 0.12, 'triangle', 0.08);
+    note(1100, 0.15, 'triangle', 0.06, 0.06);
+  } else if (name === 'cloud') {
+    note(660, 0.18, 'sine', 0.06);
+    note(990, 0.18, 'sine', 0.05, 0.08);
+  } else if (name === 'splash') {
+    note(180, 0.25, 'triangle', 0.1);
+    note(120, 0.3, 'sine', 0.08, 0.05);
+  } else if (name === 'whoosh') {
+    note(330, 0.3, 'sine', 0.05);
+    note(550, 0.3, 'sine', 0.04, 0.1);
+  } else if (name === 'sparkle') {
+    note(1568, 0.08, 'sine', 0.05);
+    note(2093, 0.1, 'sine', 0.04, 0.04);
+  }
+}
+
+// Caixa de música
+const melody = [523, 659, 784, 1047, 784, 659, 523, 440, 494, 523, 659, 784, 988, 784, 659, 523];
+let melIdx = 0;
+let musicOn = true;
+setInterval(() => {
+  if (musicOn && audioCtx) {
+    const f = melody[melIdx % melody.length];
+    note(f, 0.35, 'sine', 0.035);
+    setTimeout(() => note(f * 2, 0.1, 'sine', 0.015), 5);
+    melIdx++;
+  }
+}, 480);
+
+// ---------- Estado do jogo ----------
+const STATE = { WORLD: 'world', SLIDE: 'slide', POOL: 'pool', SKY: 'sky' };
+const game = {
+  state: STATE.WORLD,
+  stars: 0, flowers: 0, clouds: 0,
+  time: 0,
+  msgOpen: true,
+  camera: 0,    // mundo é maior que o ecrã, faz scroll
+  worldWidth: 1920,
+  msgText: '',
+};
+
+// ---------- Mundo ----------
+const world = {
+  groundY: 540,   // superfície do chão
+  hills: [
+    { x: 0, w: 380, h: 140 },
+    { x: 380, w: 250, h: 80 },
+    { x: 630, w: 200, h: 50 },
+  ],
+};
+
+// ---------- Zonas interativas ----------
+const zones = {
+  rainbow: { x: 220, w: 280 },     // escorrega
+  pool:    { x: 760, w: 380 },     // piscina de flores
+  unicorn: { x: 1380, w: 320 },    // unicórnio
+};
+
+// ---------- Player ----------
+const player = {
+  x: 140, y: world.groundY - 50,
+  vx: 0, vy: 0,
+  w: 28, h: 48,
+  facing: 1,
+  onGround: false,
+  anim: 0,         // animação andar
+  blink: 0,        // pestanejo
+  // específicos
+  sliding: false,
+  slideT: 0,       // progresso no slide 0..1
+  swimBob: 0,
+  riding: false,
+  rideBob: 0,
+};
+
+// ---------- Entidades ----------
+let stars = [];
+let flowers = [];
+let flowerPool = [];   // flores dentro da água
+let poolDrops = [];   // ondinhas
+let clouds = [];
+let bgClouds = [];
+let particles = [];
+let sparkles = [];
+let petals = [];      // pétalas a flutuar
+
+// Unicórnio
+const unicorn = {
+  x: zones.unicorn.x + 130, y: world.groundY - 90,
+  vx: 0, vy: 0,
+  w: 70, h: 100,
+  wingFlap: 0,
+  flying: false,
+};
+
+// Arco-íris
+const rainbow = {
+  cx: zones.rainbow.x + 140, cy: world.groundY - 30,
+  radius: 200,
+  tilt: 0.35,
+};
+
+// ---------- Inicialização ----------
+function reset() {
+  game.state = STATE.WORLD;
+  game.stars = 0; game.flowers = 0; game.clouds = 0;
+  player.x = 140; player.y = world.groundY - 50;
+  player.vx = 0; player.vy = 0; player.facing = 1;
+  player.sliding = false; player.riding = false;
+  unicorn.x = zones.unicorn.x + 130;
+  unicorn.y = world.groundY - 90;
+  unicorn.flying = false;
+  stars.length = 0; flowers.length = 0; flowerPool.length = 0;
+  clouds.length = 0; particles.length = 0; sparkles.length = 0;
+  buildEntities();
+  updateHUD();
+}
+function buildEntities() {
+  // Estrelas no caminho do arco-íris (formam um arco)
+  for (let i = 0; i < 12; i++) {
+    const t = i / 11;
+    const a = Math.PI * (0.15 + t * 0.7);
+    const r = rainbow.radius * (0.4 + t * 0.55);
+    stars.push({
+      x: rainbow.cx + Math.cos(a) * r,
+      y: rainbow.cy - Math.sin(a) * r * 0.85 - 20,
+      r: 11, got: false, tw: Math.random() * Math.PI * 2,
+    });
+  }
+  // Flores decorativas no chão (fora da piscina)
+  for (let i = 0; i < 22; i++) {
+    flowers.push({
+      x: 50 + Math.random() * (game.worldWidth - 100),
+      y: world.groundY + 4,
+      color: ['#ff5e9c', '#ffd93d', '#9b6cff', '#ff8fb1', '#fff'][i % 5],
+      size: 6 + Math.random() * 4,
+      sway: Math.random() * Math.PI * 2,
+    });
+  }
+  // Flores dentro da piscina
+  for (let i = 0; i < 14; i++) {
+    flowerPool.push({
+      x: zones.pool.x + 30 + Math.random() * (zones.pool.w - 60),
+      y: world.groundY + 35 + Math.random() * 30,
+      r: 9 + Math.random() * 4,
+      color: ['#ff5e9c', '#ffd93d', '#9b6cff', '#ff8fb1', '#fff'][i % 5],
+      got: false, tw: Math.random() * Math.PI * 2,
+    });
+  }
+  // Nuvens (colecionáveis no céu)
+  for (let i = 0; i < 10; i++) {
+    clouds.push({
+      x: 200 + i * 130 + Math.random() * 40,
+      y: 80 + Math.random() * 220,
+      r: 28 + Math.random() * 14,
+      got: false, tw: Math.random() * Math.PI * 2,
+    });
+  }
+  // Nuvens de fundo
+  for (let i = 0; i < 14; i++) {
+    bgClouds.push({
+      x: Math.random() * game.worldWidth,
+      y: 30 + Math.random() * 380,
+      r: 30 + Math.random() * 30,
+      speed: 0.05 + Math.random() * 0.15,
+    });
+  }
+  // Pétalas a flutuar
+  for (let i = 0; i < 30; i++) {
+    petals.push({
+      x: Math.random() * game.worldWidth,
+      y: Math.random() * H,
+      vy: 0.2 + Math.random() * 0.4,
+      vx: -0.3 + Math.random() * 0.6,
+      r: 3 + Math.random() * 3,
+      color: ['#ffb3d1', '#ffd6a5', '#fdffb6', '#caffbf', '#9bf6ff', '#bdb2ff'][i % 6],
+      rot: Math.random() * Math.PI * 2,
+      spin: -0.05 + Math.random() * 0.1,
+    });
+  }
+}
+buildEntities();
+
+// ---------- Input ----------
+const keys = {};
+document.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  keys[k] = true;
+  if (e.key === ' ') { keys['space'] = true; e.preventDefault(); }
+  if (k === 'e') interact();
+  if (k === 'r') { reset(); hideMsg(); }
+  if (k === 'x') { chrome.webview.postMessage('home'); }
+  ensureAudio();
+});
+document.addEventListener('keyup', e => {
+  const k = e.key.toLowerCase();
+  keys[k] = false;
+  if (e.key === ' ') keys['space'] = false;
+});
+
+// ---------- Interação ----------
+function interact() {
+  if (game.msgOpen) return;
+  if (game.state === STATE.WORLD) {
+    // Perto do arco-íris?
+    if (Math.abs(player.x + player.w/2 - rainbow.cx) < 180) {
+      startSlide();
+    }
+    // Perto da piscina?
+    else if (player.x > zones.pool.x - 30 && player.x < zones.pool.x + zones.pool.w) {
+      startPool();
+    }
+    // Perto do unicórnio?
+    else if (Math.abs(player.x + player.w/2 - unicorn.x) < 100) {
+      startSky();
+    }
+  } else if (game.state === STATE.POOL) {
+    if (player.y < world.groundY + 4) {
+      // sair da água
+      game.state = STATE.WORLD;
+      player.y = world.groundY - player.h;
+      sfx('whoosh');
+    }
+  } else if (game.state === STATE.SKY) {
+    if (player.y > world.groundY - player.h - 10 && !player.riding) {
+      // já desceu, sai
+      game.state = STATE.WORLD;
+      player.y = world.groundY - player.h;
+      sfx('whoosh');
+    }
+  }
+}
+
+function startSlide() {
+  game.state = STATE.SLIDE;
+  player.sliding = true;
+  player.slideT = 0;
+  player.x = rainbow.cx - player.w / 2;
+  player.y = rainbow.cy - rainbow.radius * 0.9;
+  player.vx = 0; player.vy = 0;
+  sfx('whoosh');
+}
+function startPool() {
+  game.state = STATE.POOL;
+  player.x = zones.pool.x + 60;
+  player.y = world.groundY + 20;
+  player.vx = 0; player.vy = 0;
+  sfx('splash');
+  for (let i = 0; i < 12; i++) {
+    particles.push({
+      x: player.x + player.w/2, y: world.groundY + 10,
+      vx: -2 + Math.random() * 4, vy: -2 - Math.random() * 3,
+      life: 30, color: '#7ec8e3', size: 3 + Math.random() * 4,
+    });
+  }
+}
+function startSky() {
+  game.state = STATE.SKY;
+  player.riding = true;
+  unicorn.flying = true;
+  player.x = unicorn.x - player.w/2 + 10;
+  player.y = unicorn.y - 10;
+  sfx('whoosh');
+}
+
+// ---------- Update ----------
+function update(dt) {
+  if (game.msgOpen) return;
+  game.time += dt;
+  player.blink += dt;
+  // fundo
+  bgClouds.forEach(c => {
+    c.x -= c.speed;
+    if (c.x < -80) c.x = game.worldWidth + 80;
+  });
+  // pétalas
+  petals.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.spin;
+    if (p.y > H) { p.y = -10; p.x = Math.random() * game.worldWidth; }
+    if (p.x < 0) p.x = game.worldWidth;
+    if (p.x > game.worldWidth) p.x = 0;
+  });
+  // sparkles (canto do ecrã)
+  for (let i = sparkles.length - 1; i >= 0; i--) {
+    const s = sparkles[i];
+    s.life -= dt;
+    s.x += s.vx; s.y += s.vy;
+    if (s.life <= 0) sparkles.splice(i, 1);
+  }
+  // partículas
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life -= dt;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+
+  switch (game.state) {
+    case STATE.WORLD: updateWorld(dt); break;
+    case STATE.SLIDE: updateSlide(dt); break;
+    case STATE.POOL:  updatePool(dt);  break;
+    case STATE.SKY:   updateSky(dt);   break;
+  }
+  updateHUD();
+}
+
+function updateWorld(dt) {
+  // gravidade
+  player.vy += 0.6;
+  // movimento
+  const acc = 0.6, max = 4.5;
+  if (keys['arrowleft'] || keys['a']) { player.vx -= acc; player.facing = -1; }
+  if (keys['arrowright'] || keys['d']) { player.vx += acc; player.facing = 1; }
+  if (!keys['arrowleft'] && !keys['arrowright'] && !keys['a'] && !keys['d']) {
+    player.vx *= 0.78;
+  }
+  player.vx = Math.max(-max, Math.min(max, player.vx));
+  // saltar
+  if ((keys['arrowup'] || keys['w'] || keys['space']) && player.onGround) {
+    player.vy = -13;
+    player.onGround = false;
+    sfx('whoosh');
+  }
+  player.x += player.vx;
+  player.y += player.vy;
+  // chão
+  if (player.y + player.h >= world.groundY) {
+    player.y = world.groundY - player.h;
+    player.vy = 0;
+    player.onGround = true;
+  } else {
+    player.onGround = false;
+  }
+  // limites do mundo
+  if (player.x < 0) player.x = 0;
+  if (player.x > game.worldWidth - player.w) player.x = game.worldWidth - player.w;
+  // colisão com piscina (queda na água)
+  if (player.x + player.w > zones.pool.x + 10 && player.x < zones.pool.x + zones.pool.w - 10) {
+    if (player.y + player.h > world.groundY + 18) {
+      // toca na água
+      startPool();
+    }
+  }
+  // animação
+  if (Math.abs(player.vx) > 0.5 && player.onGround) player.anim += dt * 0.4;
+  // câmara segue o player
+  const target = player.x - W / 2 + player.w / 2;
+  game.camera = Math.max(0, Math.min(game.worldWidth - W, target));
+  // prompt de interação
+  updatePrompt();
+}
+
+function updateSlide(dt) {
+  // descer o arco-íris
+  player.slideT += dt * 0.012;
+  const t = Math.min(1, player.slideT);
+  // movimento lateral do jogador para apanhar estrelas
+  if (keys['arrowleft'] || keys['a']) { player.vx = -3; }
+  else if (keys['arrowright'] || keys['d']) { player.vx = 3; }
+  else { player.vx *= 0.85; }
+  // posição segue o arco
+  const a = Math.PI * (0.15 + t * 0.7);
+  const r = rainbow.radius * (0.4 + t * 0.55);
+  const targetX = rainbow.cx + Math.cos(a) * r - player.w / 2;
+  const targetY = rainbow.cy - Math.sin(a) * r * 0.85 - player.h / 2 - 10;
+  player.x = targetX + player.vx * 0.4;
+  player.y = targetY;
+  player.facing = player.vx < 0 ? -1 : 1;
+  player.vy = 2.5 + t * 3;
+  // colecionar estrelas
+  stars.forEach(s => {
+    if (s.got) return;
+    if (Math.hypot(s.x - (player.x + player.w/2), s.y - (player.y + player.h/2)) < 26) {
+      s.got = true;
+      game.stars++;
+      sfx('star');
+      spawnSparkles(s.x, s.y, '#ffe066', 10);
+    }
+  });
+  // termina quando chega ao fim
+  if (t >= 1) {
+    // splash na piscina
+    startPool();
+    player.x = zones.pool.x + zones.pool.w / 2 - player.w / 2;
+    player.y = world.groundY - 20;
+  }
+  // câmara segue
+  const target = player.x - W / 2 + player.w / 2;
+  game.camera = Math.max(0, Math.min(game.worldWidth - W, target));
+}
+
+function updatePool(dt) {
+  // física dentro de água (gravidade reduzida, mais atrito)
+  player.vy += 0.18;
+  player.vy = Math.min(2.5, player.vy);
+  const acc = 0.4;
+  if (keys['arrowleft'] || keys['a']) player.vx -= acc;
+  if (keys['arrowright'] || keys['d']) player.vx += acc;
+  if (keys['arrowup'] || keys['w'] || keys['space']) player.vy -= 0.45;
+  if (keys['arrowdown'] || keys['s']) player.vy += 0.4;
+  player.vx *= 0.9;
+  player.y += player.vy;
+  player.x += player.vx;
+  player.swimBob += dt * 0.2;
+  // limitar à piscina
+  const minY = world.groundY - 10;
+  const maxY = world.groundY + 80;
+  if (player.y < minY) { player.y = minY; player.vy = 0.5; }
+  if (player.y > maxY) { player.y = maxY; player.vy = 0; }
+  if (player.x < zones.pool.x + 6) player.x = zones.pool.x + 6;
+  if (player.x + player.w > zones.pool.x + zones.pool.w - 6) player.x = zones.pool.x + zones.pool.w - 6 - player.w;
+  player.facing = player.vx < 0 ? -1 : 1;
+  // ondinhas
+  if (Math.random() < 0.3) {
+    poolDrops.push({
+      x: player.x + player.w/2 + (Math.random() - 0.5) * 20,
+      y: world.groundY + 8 + Math.random() * 6,
+      r: 1 + Math.random() * 2, life: 18,
+    });
+  }
+  for (let i = poolDrops.length - 1; i >= 0; i--) {
+    poolDrops[i].life -= dt;
+    if (poolDrops[i].life <= 0) poolDrops.splice(i, 1);
+  }
+  // flores
+  flowerPool.forEach(f => {
+    if (f.got) return;
+    f.tw += dt * 0.1;
+    if (Math.hypot(f.x - (player.x + player.w/2), f.y - (player.y + player.h/2)) < 22) {
+      f.got = true;
+      game.flowers++;
+      sfx('flower');
+      spawnSparkles(f.x, f.y, f.color, 8);
+    }
+  });
+  // câmara segue mas suave
+  const target = player.x - W / 2 + player.w / 2;
+  game.camera = Math.max(0, Math.min(game.worldWidth - W, target * 0.5 + game.camera * 0.5));
+}
+
+function updateSky(dt) {
+  if (player.riding) {
+    // montar no unicorn, voar
+    player.vy += 0.25;
+    const acc = 0.45;
+    if (keys['arrowleft'] || keys['a']) { unicorn.vx -= acc; player.facing = -1; }
+    if (keys['arrowright'] || keys['d']) { unicorn.vx += acc; player.facing = 1; }
+    if (keys['arrowup'] || keys['w'] || keys['space']) unicorn.vy -= 0.6;
+    if (keys['arrowdown'] || keys['s']) unicorn.vy += 0.4;
+    unicorn.vx *= 0.94; unicorn.vy *= 0.94;
+    unicorn.vx = Math.max(-5, Math.min(5, unicorn.vx));
+    unicorn.vy = Math.max(-4, Math.min(4, unicorn.vy));
+    unicorn.x += unicorn.vx;
+    unicorn.y += unicorn.vy;
+    // limites verticais
+    if (unicorn.y < 30) { unicorn.y = 30; unicorn.vy = 0.5; }
+    if (unicorn.y > world.groundY - 60) { unicorn.y = world.groundY - 60; unicorn.vy = -1; }
+    if (unicorn.x < 0) { unicorn.x = 0; unicorn.vx = 0.5; }
+    if (unicorn.x > game.worldWidth - 40) { unicorn.x = game.worldWidth - 40; unicorn.vx = -0.5; }
+    // player segue o unicorn
+    player.x = unicorn.x - player.w/2 + 10;
+    player.y = unicorn.y - 10;
+    player.rideBob += dt * 0.25;
+    unicorn.wingFlap += dt * 0.4;
+    // colecionar nuvens
+    clouds.forEach(c => {
+      if (c.got) return;
+      c.tw += dt * 0.08;
+      if (Math.hypot(c.x - (player.x + player.w/2), c.y - (player.y + player.h/2)) < c.r + 18) {
+        c.got = true;
+        game.clouds++;
+        sfx('cloud');
+        spawnSparkles(c.x, c.y, '#ffffff', 12);
+        for (let i = 0; i < 6; i++) {
+          particles.push({
+            x: c.x, y: c.y,
+            vx: -2 + Math.random() * 4, vy: -2 + Math.random() * 4,
+            life: 25, color: '#ffffff', size: 2 + Math.random() * 3,
+          });
+        }
+      }
+    });
+    // sparkles atrás do unicórnio
+    if (Math.random() < 0.5) {
+      sparkles.push({
+        x: unicorn.x - 20 + (Math.random() - 0.5) * 20,
+        y: unicorn.y + unicorn.h/2 + (Math.random() - 0.5) * 30,
+        vx: -0.5 + (Math.random() - 0.5),
+        vy: -0.5 + (Math.random() - 0.5),
+        life: 40, color: ['#ffb3d1', '#bde0fe', '#fff5ba'][Math.floor(Math.random()*3)],
+        size: 2 + Math.random() * 2,
+      });
+    }
+  }
+  // câmara segue
+  const target = player.x - W / 2 + player.w / 2;
+  game.camera = Math.max(0, Math.min(game.worldWidth - W, target));
+  // prompt
+  if (player.riding) {
+    showPrompt('Pressiona E para desmontar (em terra)');
+  }
+  // permite desmontar quando em terra
+  if (unicorn.y > world.groundY - 70) {
+    if (keys['e']) {
+      player.riding = false;
+      unicorn.flying = false;
+      player.x = unicorn.x;
+      player.y = world.groundY - player.h;
+      game.state = STATE.WORLD;
+      sfx('whoosh');
+    }
+  }
+}
+
+function updatePrompt() {
+  let text = '';
+  const px = player.x + player.w/2;
+  if (Math.abs(px - rainbow.cx) < 180 && Math.abs(player.y + player.h/2 - (rainbow.cy - rainbow.radius * 0.4)) < 200) {
+    text = '✨ Pressiona E para escorregar no arco-íris!';
+  } else if (player.x > zones.pool.x - 30 && player.x < zones.pool.x + zones.pool.w) {
+    text = '💧 Pressiona E para mergulhar na piscina de flores!';
+  } else if (Math.abs(px - unicorn.x) < 100) {
+    text = '🦄 Pressiona E para montar o unicórnio e voar!';
+  }
+  showPrompt(text);
+}
+function showPrompt(text) {
+  const el = document.getElementById('prompt');
+  if (text) { el.textContent = text; el.classList.remove('hidden'); }
+  else el.classList.add('hidden');
+}
+
+function spawnSparkles(x, y, color, n) {
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2;
+    sparkles.push({
+      x, y,
+      vx: Math.cos(a) * (1 + Math.random()),
+      vy: Math.sin(a) * (1 + Math.random()),
+      life: 28, color, size: 2 + Math.random() * 2,
+    });
+  }
+}
+
+function updateHUD() {
+  document.getElementById('stars').textContent = game.stars;
+  document.getElementById('flowers').textContent = game.flowers;
+  document.getElementById('clouds').textContent = game.clouds;
+}
+
+// ---------- Desenho ----------
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  drawSky();
+  // aplicar câmara
+  ctx.save();
+  ctx.translate(-game.camera, 0);
+  drawWorld();
+  drawEntities();
+  drawPlayer();
+  drawUnicorn();
+  ctx.restore();
+  // overlays (sem câmara)
+  drawForeground();
+  drawPromptUI();
+}
+
+function drawSky() {
+  // gradiente do céu, parallax com a câmara
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#ffc1e3');
+  g.addColorStop(0.45, '#cce4ff');
+  g.addColorStop(0.85, '#d6f5e3');
+  g.addColorStop(1, '#fff3a8');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  // sol
+  const sx = 150 - game.camera * 0.1;
+  const sy = 120;
+  const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, 90);
+  grad.addColorStop(0, 'rgba(255, 244, 170, 0.9)');
+  grad.addColorStop(1, 'rgba(255, 244, 170, 0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(sx - 90, sy - 90, 180, 180);
+  ctx.fillStyle = '#fff2a8';
+  ctx.beginPath();
+  ctx.arc(sx, sy, 50, 0, Math.PI*2);
+  ctx.fill();
+  // arco-íris de fundo (decorativo, em todo o lado)
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  const colors = ['#ff6b9d', '#ffa07a', '#ffd93d', '#6bcf7f', '#4d96ff', '#c084fc'];
+  const cx = 700 - game.camera * 0.15;
+  for (let i = 0; i < 6; i++) {
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 28;
+    ctx.beginPath();
+    ctx.arc(cx, 480, 380 + i * 28, Math.PI, 0);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawWorld() {
+  // nuvens de fundo
+  bgClouds.forEach(c => drawCloud(c.x, c.y, c.r, 0.7));
+  // montanhas distantes
+  ctx.fillStyle = '#c8b6e2';
+  drawHill(0, world.groundY, 400, 130);
+  drawHill(450, world.groundY, 380, 100);
+  drawHill(900, world.groundY, 420, 140);
+  drawHill(1400, world.groundY, 350, 110);
+  // chão
+  ctx.fillStyle = '#a7e8b4';
+  ctx.fillRect(0, world.groundY, game.worldWidth, H - world.groundY);
+  // relva
+  ctx.fillStyle = '#7ed99a';
+  for (let x = 0; x < game.worldWidth; x += 8) {
+    const h = 3 + Math.sin(x * 0.3) * 1.5;
+    ctx.fillRect(x, world.groundY - h, 3, h);
+  }
+  // flores no chão
+  flowers.forEach(f => drawFlower(f.x, f.y, f.color, f.size, f.sway + game.time * 0.05));
+  // piscina
+  drawPool();
+  // arco-íris
+  drawRainbow();
+  // zona de marcação no chão (área de interação)
+  drawZoneMarkers();
+  // nuvens colecionáveis (só as não apanhadas)
+  clouds.forEach(c => { if (!c.got) drawCollectibleCloud(c.x, c.y, c.r, c.tw); });
+}
+
+function drawHill(x, y, w, h) {
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.quadraticCurveTo(x + w/2, y - h, x + w, y);
+  ctx.lineTo(x + w, y + 20);
+  ctx.lineTo(x, y + 20);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawCloud(x, y, r, alpha = 1) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2);
+  ctx.arc(x + r*0.7, y - r*0.2, r*0.8, 0, Math.PI*2);
+  ctx.arc(x - r*0.7, y - r*0.1, r*0.7, 0, Math.PI*2);
+  ctx.arc(x + r*0.3, y + r*0.2, r*0.6, 0, Math.PI*2);
+  ctx.arc(x - r*0.4, y + r*0.1, r*0.5, 0, Math.PI*2);
+  ctx.fill();
+  // sombra
+  ctx.fillStyle = 'rgba(180, 200, 230, 0.4)';
+  ctx.beginPath();
+  ctx.ellipse(x, y + r*0.5, r*1.3, r*0.25, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawCollectibleCloud(x, y, r, t) {
+  // halo brilhante
+  ctx.save();
+  const pulse = 1 + Math.sin(t) * 0.1;
+  const grad = ctx.createRadialGradient(x, y, 0, x, y, r * 1.8 * pulse);
+  grad.addColorStop(0, 'rgba(255, 255, 200, 0.6)');
+  grad.addColorStop(1, 'rgba(255, 255, 200, 0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(x - r*2, y - r*2, r*4, r*4);
+  ctx.restore();
+  drawCloud(x, y, r);
+}
+
+function drawPool() {
+  const px = zones.pool.x, pw = zones.pool.w;
+  // base da água (coval)
+  ctx.fillStyle = '#7ec8e3';
+  roundRect(px, world.groundY + 6, pw, 110, 30, true);
+  // água escura
+  ctx.fillStyle = '#5fb3d6';
+  roundRect(px + 6, world.groundY + 14, pw - 12, 90, 26, true);
+  // brilho
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  for (let i = 0; i < 5; i++) {
+    const t = game.time * 0.7 + i;
+    const wx = px + 20 + ((Math.sin(t) + 1) / 2) * (pw - 40);
+    const wy = world.groundY + 20 + i * 15;
+    ctx.fillRect(wx, wy, 16, 2);
+  }
+  // ondinhas do jogador
+  poolDrops.forEach(d => {
+    ctx.fillStyle = `rgba(255,255,255,${d.life / 18 * 0.9})`;
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
+    ctx.fill();
+  });
+  // flores da piscina
+  flowerPool.forEach(f => {
+    if (f.got) return;
+    drawFlower(f.x, f.y, f.color, f.r, f.tw);
+  });
+  // borda de flores em volta
+  for (let i = 0; i < 8; i++) {
+    const fx = px + 10 + i * ((pw - 20) / 7);
+    drawFlower(fx, world.groundY + 8, ['#ff5e9c','#ffd93d','#fff','#9b6cff'][i%4], 7, game.time + i);
+  }
+}
+
+function drawRainbow() {
+  const colors = ['#ff5e9c', '#ff8c5e', '#ffd93d', '#6bcf7f', '#4d96ff', '#c084fc'];
+  ctx.save();
+  ctx.translate(rainbow.cx, rainbow.cy);
+  ctx.rotate(rainbow.tilt);
+  for (let i = 0; i < 6; i++) {
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 22;
+    ctx.beginPath();
+    ctx.arc(0, 0, rainbow.radius - i * 22, Math.PI, 0);
+    ctx.stroke();
+  }
+  // brilhos
+  ctx.globalCompositeOperation = 'screen';
+  for (let i = 0; i < 5; i++) {
+    const a = Math.PI * (0.2 + i * 0.13) + game.time * 0.5;
+    const x = Math.cos(a) * (rainbow.radius - 30);
+    const y = -Math.sin(a) * (rainbow.radius - 30);
+    const g = ctx.createRadialGradient(x, y, 0, x, y, 12);
+    g.addColorStop(0, 'rgba(255,255,255,0.9)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x - 12, y - 12, 24, 24);
+  }
+  ctx.restore();
+  // estrelas no caminho
+  stars.forEach(s => {
+    if (s.got) return;
+    drawStar(s.x, s.y, 8 + Math.sin(s.tw + game.time) * 1.5, '#ffe066', '#ffb700');
+  });
+}
+
+function drawZoneMarkers() {
+  // pequena sombra debaixo do unicórnio
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.beginPath();
+  ctx.ellipse(unicorn.x + 35, world.groundY + 2, 50, 6, 0, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawEntities() {
+  // partículas
+  particles.forEach(p => {
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = Math.max(0, p.life / 30);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  // sparkles
+  sparkles.forEach(s => {
+    ctx.fillStyle = s.color;
+    ctx.globalAlpha = Math.max(0, s.life / 28);
+    drawStarShape(s.x, s.y, s.size);
+  });
+  ctx.globalAlpha = 1;
+}
+
+function drawPlayer() {
+  // sombra se não estiver na água
+  if (game.state !== STATE.POOL) {
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(player.x + player.w/2, world.groundY + 2, 18, 4, 0, 0, Math.PI*2);
+    ctx.fill();
+  }
+  const px = player.x, py = player.y;
+  ctx.save();
+  ctx.translate(px + player.w/2, py + player.h/2);
+  if (player.facing < 0) ctx.scale(-1, 1);
+  // pequeno bob
+  let bob = 0;
+  if (player.onGround && Math.abs(player.vx) > 0.5) bob = Math.sin(player.anim * 10) * 2;
+  ctx.translate(0, bob);
+  if (player.state === STATE.POOL) ctx.translate(0, Math.sin(player.swimBob) * 1.5);
+
+  // corpo
+  ctx.fillStyle = '#ffb3d9';
+  roundRect(-12, -4, 24, 28, 10, true);
+  // camisola
+  ctx.fillStyle = '#ff5e9c';
+  roundRect(-12, 4, 24, 14, 6, true);
+  // bracinhos
+  ctx.fillStyle = '#ffb3d9';
+  ctx.beginPath();
+  ctx.arc(-12, 12, 5, 0, Math.PI*2);
+  ctx.arc(12, 12, 5, 0, Math.PI*2);
+  ctx.fill();
+  // cabeça
+  ctx.fillStyle = '#ffe0d0';
+  ctx.beginPath();
+  ctx.arc(0, -14, 14, 0, Math.PI*2);
+  ctx.fill();
+  // cabelo
+  ctx.fillStyle = '#9b6cff';
+  ctx.beginPath();
+  ctx.arc(0, -18, 14, Math.PI, 0);
+  ctx.fill();
+  ctx.fillRect(-14, -22, 28, 6);
+  // olhos (pestanejo)
+  const eyeOpen = (Math.floor(player.blink / 4) % 50) !== 0;
+  ctx.fillStyle = '#3a2a52';
+  if (eyeOpen) {
+    ctx.beginPath();
+    ctx.arc(-4, -14, 1.8, 0, Math.PI*2);
+    ctx.arc(5, -14, 1.8, 0, Math.PI*2);
+    ctx.fill();
+    // brilho
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(-3, -15, 0.7, 0, Math.PI*2);
+    ctx.arc(6, -15, 0.7, 0, Math.PI*2);
+    ctx.fill();
+  } else {
+    ctx.fillRect(-6, -14, 4, 1);
+    ctx.fillRect(3, -14, 4, 1);
+  }
+  // bochechas
+  ctx.fillStyle = '#ff9ec0';
+  ctx.beginPath();
+  ctx.arc(-7, -10, 2.5, 0, Math.PI*2);
+  ctx.arc(8, -10, 2.5, 0, Math.PI*2);
+  ctx.fill();
+  // boca sorridente
+  ctx.strokeStyle = '#a04060';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(1, -8, 3, 0.1, Math.PI - 0.1);
+  ctx.stroke();
+  // chapéu de estrela se a brincar
+  if (game.state === STATE.SLIDE || game.state === STATE.SKY) {
+    drawStarShape(0, -28, 6, '#ffd93d', '#ff8c00');
+  }
+  ctx.restore();
+}
+
+function drawUnicorn() {
+  if (!unicorn) return;
+  const ux = unicorn.x, uy = unicorn.y;
+  ctx.save();
+  ctx.translate(ux + unicorn.w/2, uy + unicorn.h/2);
+  if (player.facing < 0) ctx.scale(-1, 1);
+  ctx.translate(0, Math.sin(unicorn.wingFlap * 6) * 1.5);
+  // corpo
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = '#e0d0f0';
+  ctx.lineWidth = 2;
+  roundRect(-30, 0, 60, 32, 14, true);
+  // pescoço
+  ctx.beginPath();
+  ctx.moveTo(20, 4);
+  ctx.quadraticCurveTo(36, -10, 38, -28);
+  ctx.lineTo(28, -30);
+  ctx.quadraticCurveTo(24, -10, 12, 4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  // cabeça
+  ctx.beginPath();
+  ctx.ellipse(36, -34, 12, 9, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.stroke();
+  // focinho
+  ctx.fillStyle = '#ffe0e8';
+  ctx.beginPath();
+  ctx.ellipse(46, -32, 6, 4, 0, 0, Math.PI*2);
+  ctx.fill();
+  // olho
+  ctx.fillStyle = '#3a2a52';
+  ctx.beginPath();
+  ctx.arc(40, -36, 1.8, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(40.5, -36.5, 0.6, 0, Math.PI*2);
+  ctx.fill();
+  // nariz
+  ctx.fillStyle = '#ffb3d1';
+  ctx.beginPath();
+  ctx.arc(50, -32, 1.5, 0, Math.PI*2);
+  ctx.fill();
+  // orelhas
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.moveTo(30, -42);
+  ctx.lineTo(28, -52);
+  ctx.lineTo(36, -46);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(36, -42);
+  ctx.lineTo(40, -52);
+  ctx.lineTo(42, -44);
+  ctx.closePath();
+  ctx.fill();
+  // corninho (chifre)
+  ctx.fillStyle = '#ffd93d';
+  ctx.strokeStyle = '#ff9b3d';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(32, -42);
+  ctx.lineTo(30, -60);
+  ctx.lineTo(36, -50);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  // crina arco-íris
+  const maneColors = ['#ff5e9c', '#ff8c5e', '#ffd93d', '#6bcf7f', '#4d96ff', '#c084fc'];
+  for (let i = 0; i < maneColors.length; i++) {
+    ctx.fillStyle = maneColors[i];
+    ctx.beginPath();
+    const t = game.time * 2 + i;
+    ctx.moveTo(28, -30 + i * 4);
+    ctx.quadraticCurveTo(18 - i*2 + Math.sin(t)*2, -10 + i*2, 22 - i*2 + Math.sin(t)*3, 14 + i*3);
+    ctx.lineTo(28 - i*2, 14 + i*3);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // cauda
+  const tailColors = ['#c084fc', '#4d96ff', '#6bcf7f', '#ffd93d', '#ff8c5e', '#ff5e9c'];
+  for (let i = 0; i < tailColors.length; i++) {
+    ctx.fillStyle = tailColors[i];
+    ctx.beginPath();
+    const t = game.time * 2 + i;
+    ctx.moveTo(-30, 4 + i*3);
+    ctx.quadraticCurveTo(-50 - i*2 + Math.sin(t)*3, 10 + i*4, -55 - i*2, 30 + i*3);
+    ctx.lineTo(-48 - i*2, 32 + i*3);
+    ctx.quadraticCurveTo(-44 - i*2, 14 + i*2, -24, 14 + i*3);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // patas
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(-22, 28, 8, 18);
+  ctx.fillRect(-8, 28, 8, 18);
+  ctx.fillRect(8, 28, 8, 18);
+  ctx.fillRect(20, 28, 8, 18);
+  // cascos
+  ctx.fillStyle = '#c8a8e0';
+  ctx.fillRect(-22, 44, 8, 4);
+  ctx.fillRect(-8, 44, 8, 4);
+  ctx.fillRect(8, 44, 8, 4);
+  ctx.fillRect(20, 44, 8, 4);
+  // asas (se a voar)
+  if (unicorn.flying) {
+    const wf = Math.sin(unicorn.wingFlap * 6) * 0.5;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.strokeStyle = '#e0d0f0';
+    ctx.lineWidth = 2;
+    // asa esquerda
+    ctx.save();
+    ctx.translate(-10, -4);
+    ctx.rotate(-0.4 + wf);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(-30, -20 - Math.abs(wf)*10, -36, -2);
+    ctx.quadraticCurveTo(-20, 6, 0, 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    // asa direita
+    ctx.save();
+    ctx.translate(10, -4);
+    ctx.rotate(0.4 - wf);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(30, -20 - Math.abs(wf)*10, 36, -2);
+    ctx.quadraticCurveTo(20, 6, 0, 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+  // se o player estiver a montar, esconder (já desenhado em drawPlayer)
+  ctx.restore();
+}
+
+function drawForeground() {
+  // overlay suave no topo
+  const g = ctx.createLinearGradient(0, 0, 0, 60);
+  g.addColorStop(0, 'rgba(255, 192, 220, 0.3)');
+  g.addColorStop(1, 'rgba(255, 192, 220, 0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, 60);
+  // vinheta
+  const v = ctx.createRadialGradient(W/2, H/2, 200, W/2, H/2, 800);
+  v.addColorStop(0, 'rgba(0,0,0,0)');
+  v.addColorStop(1, 'rgba(180, 100, 160, 0.18)');
+  ctx.fillStyle = v;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function drawPromptUI() {
+  // indicador do estado atual
+  ctx.save();
+  const labels = {
+    [STATE.WORLD]: '🌍 Explora o Dreamland',
+    [STATE.SLIDE]: '🌈 A escorregar no arco-íris!',
+    [STATE.POOL]: '💧 A nadar entre flores',
+    [STATE.SKY]: '🦄 A voar nas nuvens',
+  };
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  roundRect(W/2 - 140, H - 60, 280, 36, 18, true);
+  ctx.fillStyle = '#6b3a8c';
+  ctx.font = 'bold 18px "Comic Sans MS", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(labels[game.state] || '', W/2, H - 36);
+  ctx.restore();
+}
+
+// ---------- Helpers ----------
+function drawFlower(x, y, color, size, t) {
+  ctx.save();
+  ctx.translate(x, y);
+  const sway = Math.sin(t) * 0.15;
+  ctx.rotate(sway);
+  // caule
+  ctx.fillStyle = '#5fb86d';
+  ctx.fillRect(-1, 0, 2, 8);
+  // pétalas
+  ctx.fillStyle = color;
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.ellipse(Math.cos(a) * size * 0.6, Math.sin(a) * size * 0.6, size * 0.5, size * 0.35, a, 0, Math.PI*2);
+    ctx.fill();
+  }
+  // centro
+  ctx.fillStyle = '#fff2a8';
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.4, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+function drawStar(x, y, r, c1, c2) {
+  // halo
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r * 2);
+  g.addColorStop(0, 'rgba(255, 240, 100, 0.6)');
+  g.addColorStop(1, 'rgba(255, 240, 100, 0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(x - r*2, y - r*2, r*4, r*4);
+  drawStarShape(x, y, r, c1, c2);
+}
+function drawStarShape(x, y, r, fill = '#ffe066', stroke = '#ff8c00') {
+  ctx.save();
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2 - Math.PI / 2;
+    const rr = i % 2 === 0 ? r : r * 0.45;
+    const px = x + Math.cos(a) * rr;
+    const py = y + Math.sin(a) * rr;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+function roundRect(x, y, w, h, r, fill) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  if (fill) ctx.fill();
+}
+
+// ---------- Mensagem inicial ----------
+const msgEl = document.getElementById('message');
+const msgBtn = document.getElementById('msg-button');
+const msgTitle = document.getElementById('msg-title');
+const msgText = document.getElementById('msg-text');
+
+function hideMsg() {
+  msgEl.classList.add('hidden');
+  game.msgOpen = false;
+}
+function showMsg(title, text) {
+  msgTitle.textContent = title;
+  msgText.innerHTML = text;
+  msgEl.classList.remove('hidden');
+  game.msgOpen = true;
+}
+msgBtn.addEventListener('click', () => {
+  hideMsg();
+  ensureAudio();
+});
+
+// ---------- Loop principal ----------
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(50, now - last) / (1000/60);
+  last = now;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// Mensagens de feedback conforme se progride
+function checkProgress() {
+  if (game.state !== STATE.WORLD) return;
+  if (game.stars >= 6 && game.flowers < 6 && !window._fShown) {
+    window._fShown = true;
+    setTimeout(() => showMsg('🌸 Quase lá!',
+      'Apanhaste muitas estrelas! Agora <b>mergulha na piscina</b> e recolhe as flores mágicas!'), 200);
+  }
+  if (game.flowers >= 6 && game.clouds < 5 && !window._cShown) {
+    window._cShown = true;
+    setTimeout(() => showMsg('🦄 Última paragem!',
+      'Excelente! Agora <b>monta o unicórnio</b> e voa por entre as nuvens!'), 200);
+  }
+  if (game.stars >= 8 && game.flowers >= 8 && game.clouds >= 6 && !window._dShown) {
+    window._dShown = true;
+    setTimeout(() => showMsg('✨ Parabéns!',
+      'Completaste o Dreamland! 🌈🦄🌸 Continua a explorar e a colecionar!'), 200);
+  }
+}
+setInterval(checkProgress, 800);
+</script>
+</body>
+</html>

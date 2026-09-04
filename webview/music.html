@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>∞ Criador de Música �</title>
+<style>
+  :root {
+    --bg: #0a0a14;
+    --panel: #14141f;
+    --border: #2a2a3a;
+    --fg: #d8d8e8;
+    --dim: #6a6a7a;
+    --accent: #b388ff;
+    --accent2: #ff4d6d;
+    --accent3: #00d9ff;
+    --accent4: #ffd166;
+    --grid: #1a1a28;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(179, 136, 255, 0.06), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(255, 77, 109, 0.04), transparent 40%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  header {
+    text-align: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(179, 136, 255, 0.05), transparent);
+  }
+
+  h1 {
+    font-size: 2rem;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% 100%;
+    animation: shimmer 5s linear infinite;
+  }
+  @keyframes shimmer {
+    from { background-position: 0% 50%; }
+    to   { background-position: 200% 50%; }
+  }
+
+  .subtitle { color: var(--dim); font-size: 0.85rem; margin-top: 5px; }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* PAINEL DE CONTROLES */
+  .control-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+  }
+
+  .control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .control label {
+    font-size: 0.75rem;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .control input[type="number"],
+  .control input[type="text"],
+  .control select {
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+
+  .control input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .control .value {
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-align: right;
+  }
+
+  /* BOTÕES */
+  button {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--accent);
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+  }
+  button:hover {
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 0 12px var(--accent);
+  }
+  button.danger { border-color: var(--accent2); }
+  button.danger:hover { background: var(--accent2); color: var(--bg); box-shadow: 0 0 12px var(--accent2); }
+  button.warn { border-color: var(--accent4); }
+  button.warn:hover { background: var(--accent4); color: var(--bg); box-shadow: 0 0 12px var(--accent4); }
+  button.success { border-color: #00ff88; }
+  button.success:hover { background: #00ff88; color: var(--bg); box-shadow: 0 0 12px #00ff88; }
+
+  .btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* PIANO ROLL */
+  .piano-container {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 15px;
+  }
+
+  .piano-header {
+    background: rgba(179, 136, 255, 0.05);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--dim);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .piano-grid-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .piano-grid {
+    display: grid;
+    grid-template-columns: 60px repeat(var(--cols), 1fr);
+    grid-template-rows: repeat(var(--rows), 30px);
+    background: var(--grid);
+    min-width: max-content;
+  }
+
+  .row-label {
+    background: rgba(0,0,0,0.4);
+    color: var(--fg);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s;
+  }
+  .row-label:hover { background: rgba(179, 136, 255, 0.2); }
+  .row-label.black { background: rgba(0,0,0,0.6); color: var(--accent); }
+  .row-label.beat { border-bottom: 2px solid var(--accent); }
+
+  .cell {
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.1s;
+    position: relative;
+  }
+  .cell:hover { background: rgba(179, 136, 255, 0.15); }
+  .cell.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    box-shadow: inset 0 0 6px rgba(255,255,255,0.3);
+  }
+  .cell.active::after {
+    content: '●';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.7rem;
+  }
+  .cell.beat-start { border-left: 2px solid var(--accent2); }
+  .cell.playing {
+    background: rgba(255, 77, 109, 0.4) !important;
+    box-shadow: 0 0 8px var(--accent2);
+  }
+
+  /* VIRTUAL KEYBOARD */
+  .keyboard {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .keys {
+    display: flex;
+    position: relative;
+    height: 100px;
+    user-select: none;
+  }
+
+  .key {
+    flex: 1;
+    background: linear-gradient(180deg, #f5f5f5, #d0d0d0);
+    border: 1px solid #888;
+    border-radius: 0 0 4px 4px;
+    margin: 0 1px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 6px;
+    color: #222;
+    font-size: 0.7rem;
+    transition: background 0.1s;
+  }
+  .key.black {
+    background: linear-gradient(180deg, #2a2a2a, #000);
+    color: #ddd;
+    position: absolute;
+    width: 6%;
+    height: 65%;
+    z-index: 2;
+  }
+  .key:hover, .key.active {
+    background: linear-gradient(180deg, var(--accent), var(--accent3));
+    color: white;
+  }
+
+  /* PRESETS */
+  .presets {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .preset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .preset-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .preset-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(179, 136, 255, 0.3);
+  }
+  .preset-card .icon { font-size: 1.5rem; margin-bottom: 5px; }
+  .preset-card .name { font-size: 0.8rem; }
+  .preset-card .bpm { font-size: 0.7rem; color: var(--dim); }
+
+  /* SEQUÊNCIA ATUAL */
+  .sequence-display {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .seq-row {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .seq-row .label {
+    width: 60px;
+    font-size: 0.7rem;
+    color: var(--dim);
+  }
+  .seq-cell {
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .seq-cell.on { background: var(--accent); color: var(--bg); }
+
+  /* STATUS */
+  .status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    z-index: 100;
+  }
+  .status .playing { color: #00ff88; }
+  .status .stopped { color: var(--dim); }
+
+  /* MODAL */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal.ativo { display: flex; }
+  .modal-content {
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 25px;
+    max-width: 500px;
+    width: 90%;
+  }
+  .modal-content h3 { margin-bottom: 15px; color: var(--accent); }
+  .modal-content textarea {
+    width: 100%;
+    height: 200px;
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    padding: 10px;
+    font-family: monospace;
+    border-radius: 4px;
+    resize: vertical;
+  }
+
+  /* VISUALIZADOR */
+  .visualizer {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  canvas#viz {
+    width: 100%;
+    height: 100px;
+    background: var(--bg);
+    border-radius: 4px;
+  }
+
+  .info-line {
+    font-size: 0.75rem;
+    color: var(--dim);
+    margin-top: 5px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>∞ Criador de Música ∞</h1>
+  <p class="subtitle">Toca, compõe, toca — tudo no browser, sem plugins</p>
+</header>
+
+<div class="container">
+
+  <!-- PAINEL DE CONTROLES PRINCIPAIS -->
+  <div class="control-panel">
+    <div class="control">
+      <label>BPM</label>
+      <input type="number" id="bpm" min="40" max="240" value="120">
+      <div class="value"><span id="bpm-display">120</span></div>
+    </div>
+
+    <div class="control">
+      <label>Instrumento</label>
+      <select id="instrument">
+        <option value="sine">Sine (suave)</option>
+        <option value="triangle">Triangle (suave+)</option>
+        <option value="sawtooth" selected>Sawtooth (serra)</option>
+        <option value="square">Square (8-bit)</option>
+        <option value="noise">Noise (percussão)</option>
+        <option value="fm">FM (sintetizado)</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label>Volume master</label>
+      <input type="range" id="volume" min="0" max="100" value="60">
+      <div class="value"><span id="volume-display">60</span>%</div>
+    </div>
+
+    <div class="control">
+      <label>Colunas</label>
+      <input type="number" id="cols" min="4" max="32" value="16">
+    </div>
+  </div>
+
+  <!-- BOTÕES PRINCIPAIS -->
+  <div class="control-panel">
+    <div class="btn-group" style="grid-column: 1/-1;">
+      <button id="play" class="success">▶ Tocar</button>
+      <button id="stop" class="danger">■ Parar</button>
+      <button id="clear" class="warn">⌫ Limpar</button>
+      <button id="randomize">🎲 Aleatório</button>
+      <button id="save">💾 Guardar</button>
+      <button id="load">📂 Carregar</button>
+      <button id="export">📤 Exportar JSON</button>
+      <button id="import">📥 Importar JSON</button>
+      <button id="tap">⌨ Teclado</button>
+	  <button onclick="localStorage.clear()">Limpar musicas guardadas</button>
+	  <button onclick="chrome.webview.postMessage('home')">Sair</button>
+    </div>
+  </div>
+
+  <!-- VISUALIZADOR -->
+  <div class="visualizer">
+    <canvas id="viz"></canvas>
+    <div class="info-line">Visualizador de waveform — reage à música que tocas</div>
+  </div>
+
+  <!-- PIANO ROLL -->
+  <div class="piano-container">
+    <div class="piano-header">
+      <span>🎹 Piano Roll — clica nas células para colocar notas. Clica outra vez para remover.</span>
+      <span>Notas mais altas = mais agudo | Linhas a cada 4 colunas = batida</span>
+    </div>
+    <div class="piano-grid-wrapper">
+      <div class="piano-grid" id="grid"></div>
+    </div>
+  </div>
+
+  <!-- TECLADO VIRTUAL -->
+  <div class="keyboard">
+    <div class="info-line">⌨ Teclado virtual (C4 a C5): teclas A S D F G H J K | W E T Y U para sustenidos</div>
+    <div class="keys" id="keys"></div>
+  </div>
+
+  <!-- PRESETS -->
+  <div class="presets">
+    <strong>🎵 Presets — clica para carregar</strong>
+    <div class="preset-grid" id="presets"></div>
+  </div>
+
+  <!-- SEQUÊNCIA ATUAL -->
+  <div class="sequence-display">
+    <strong>📋 Sequência atual</strong>
+    <div class="info-line" id="seq-info">Sem notas</div>
+    <div id="seq-rows"></div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3 id="modal-title">Guardar / Carregar</h3>
+    <textarea id="modal-text" placeholder="..."></textarea>
+    <div class="btn-group" style="margin-top: 15px; justify-content: flex-end;">
+      <button id="modal-cancel">Cancelar</button>
+      <button id="modal-confirm" class="success">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div class="status">
+  Estado: <span id="status-text" class="stopped">parado</span>
+</div>
+
+<script>
+/* ======================================================
+   CONFIGURACAO
+   ====================================================== */
+const NOTAS = [
+  { nome: 'C5', freq: 523.25, black: false },
+  { nome: 'B4', freq: 493.88, black: false },
+  { nome: 'A#4', freq: 466.16, black: true },
+  { nome: 'A4', freq: 440.00, black: false },
+  { nome: 'G#4', freq: 415.30, black: true },
+  { nome: 'G4', freq: 392.00, black: false },
+  { nome: 'F#4', freq: 369.99, black: true },
+  { nome: 'F4', freq: 349.23, black: false },
+  { nome: 'E4', freq: 329.63, black: false },
+  { nome: 'D#4', freq: 311.13, black: true },
+  { nome: 'D4', freq: 293.66, black: false },
+  { nome: 'C#4', freq: 277.18, black: true },
+  { nome: 'C4', freq: 261.63, black: false },
+];
+
+const KEY_MAP = {
+  'a': 12, 'w': 11, 's': 10, 'e': 9, 'd': 8, 'f': 7,
+  't': 6, 'g': 5, 'y': 4, 'h': 3, 'u': 2, 'j': 1, 'k': 0
+};
+
+const PRESETS = [
+  { nome: 'House Beat',   icon: '🏠', bpm: 124, notas: [[8,0],[8,4],[8,8],[8,12],[10,0],[10,8],[5,2],[5,6],[5,10],[5,14],[2,0],[2,8]] },
+  { nome: 'Pop Melody',   icon: '🎤', bpm: 120, notas: [[0,0],[0,4],[4,8],[2,12],[4,0],[2,4],[0,8],[4,12]] },
+  { nome: '8-bit Run',    icon: '👾', bpm: 160, notas: [[0,0],[2,0],[4,0],[7,0],[4,0],[2,0],[0,2],[2,2],[4,2],[7,2],[4,2],[2,2]] },
+  { nome: 'Bass Drop',    icon: '🔊', bpm: 128, notas: [[12,0],[12,0],[12,4],[12,8],[12,0],[12,0],[12,12],[12,0]] },
+  { nome: 'Arpejo',       icon: '🌊', bpm: 100, notas: [[0,0],[2,2],[4,4],[7,6],[4,8],[2,10],[0,12],[2,14]] },
+  { nome: 'Escala Do',    icon: '🎼', bpm: 100, notas: [[12,0],[10,2],[8,4],[7,6],[5,8],[3,10],[1,12],[0,14]] },
+  { nome: 'Random Funk',  icon: '🎲', bpm: 110, notas: [] },
+  { nome: 'Twinkle',      icon: '✨', bpm: 100, notas: [[12,0],[12,0],[7,4],[7,4],[9,8],[9,8],[7,12],[5,0],[5,0],[4,4],[4,4],[2,8],[2,8],[0,12]] },
+];
+
+/* ======================================================
+   ESTADO
+   ====================================================== */
+let cols = 16;
+let grid = {};  // chave "row,col" -> true
+let audioCtx = null;
+let masterGain = null;
+let analyser = null;
+let isPlaying = false;
+let currentStep = 0;
+let intervalId = null;
+let savedSequences = JSON.parse(localStorage.getItem('seqs') || '{}');
+let modalCallback = null;
+
+/* ======================================================
+   AUDIO
+   ====================================================== */
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = document.getElementById('volume').value / 100;
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    masterGain.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    startVisualizer();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function playNote(freq, instrument, dur = 0.3) {
+  if (!audioCtx) ensureAudio();
+  const t = audioCtx.currentTime;
+
+  let source;
+  if (instrument === 'noise') {
+    const bufferSize = audioCtx.sampleRate * dur;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+  } else if (instrument === 'fm') {
+    const carrier = audioCtx.createOscillator();
+    const modulator = audioCtx.createOscillator();
+    const modGain = audioCtx.createGain();
+    modulator.frequency.value = freq * 2;
+    modGain.gain.value = freq * 0.5;
+    modulator.connect(modGain);
+    modGain.connect(carrier.frequency);
+    carrier.frequency.value = freq;
+    source = carrier;
+    modulator.start(t);
+    modulator.stop(t + dur);
+  } else {
+    source = audioCtx.createOscillator();
+    source.type = instrument;
+    source.frequency.value = freq;
+  }
+
+  const gain = audioCtx.createGain();
+  // envelope ADSR
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(0.3, t + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+  source.connect(gain);
+  gain.connect(masterGain);
+  source.start(t);
+  source.stop(t + dur);
+}
+
+/* ======================================================
+   GRID
+   ====================================================== */
+function buildGrid() {
+  const gridEl = document.getElementById('grid');
+  gridEl.innerHTML = '';
+  gridEl.style.setProperty('--cols', cols);
+  gridEl.style.setProperty('--rows', NOTAS.length);
+
+  // Labels de nota
+  NOTAS.forEach((nota, row) => {
+    const label = document.createElement('div');
+    label.className = 'row-label' + (nota.black ? ' black' : '') + (row % 4 === 0 ? ' beat' : '');
+    label.textContent = nota.nome;
+    label.title = 'Clica para pré-visualizar';
+    label.addEventListener('click', () => playNote(nota.freq, document.getElementById('instrument').value));
+    gridEl.appendChild(label);
+  });
+
+  // Celulas
+  for (let row = 0; row < NOTAS.length; row++) {
+    for (let col = 0; col < cols; col++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell' + (col % 4 === 0 ? ' beat-start' : '');
+      cell.dataset.row = row;
+      cell.dataset.col = col;
+      if (grid[`${row},${col}`]) cell.classList.add('active');
+      cell.addEventListener('click', () => toggleCell(row, col));
+      gridEl.appendChild(cell);
+    }
+  }
+}
+
+function toggleCell(row, col) {
+  ensureAudio();
+  const key = `${row},${col}`;
+  if (grid[key]) {
+    delete grid[key];
+    playNote(NOTAS[row].freq, document.getElementById('instrument').value, 0.1);
+  } else {
+    grid[key] = true;
+    playNote(NOTAS[row].freq, document.getElementById('instrument').value, 0.2);
+  }
+  buildGrid();
+  updateSeqDisplay();
+}
+
+function clearGrid() {
+  grid = {};
+  buildGrid();
+  updateSeqDisplay();
+}
+
+function randomizeGrid() {
+  clearGrid();
+  const instrument = document.getElementById('instrument').value;
+  // coloca 12-25 notas aleatorias
+  const count = 12 + Math.floor(Math.random() * 14);
+  for (let i = 0; i < count; i++) {
+    const row = Math.floor(Math.random() * NOTAS.length);
+    const col = Math.floor(Math.random() * cols);
+    grid[`${row},${col}`] = true;
+  }
+  buildGrid();
+  updateSeqDisplay();
+}
+
+/* ======================================================
+   PLAYBACK
+   ====================================================== */
+function play() {
+  ensureAudio();
+  if (Object.keys(grid).length === 0) {
+    alert('Nao ha notas! Coloca algumas primeiro.');
+    return;
+  }
+  isPlaying = true;
+  document.getElementById('status-text').textContent = 'a tocar';
+  document.getElementById('status-text').className = 'playing';
+
+  const bpm = parseInt(document.getElementById('bpm').value);
+  const stepMs = (60 * 1000) / bpm / 2; // cada "coluna" e meio beat
+
+  currentStep = 0;
+  if (intervalId) clearInterval(intervalId);
+  intervalId = setInterval(() => {
+    playStep(currentStep);
+    currentStep = (currentStep + 1) % cols;
+  }, stepMs);
+}
+
+function playStep(col) {
+  const instrument = document.getElementById('instrument').value;
+  // destaca celulas activas
+  document.querySelectorAll('.cell.playing').forEach(c => c.classList.remove('playing'));
+  for (const key in grid) {
+    const [row, c] = key.split(',').map(Number);
+    if (c === col) {
+      playNote(NOTAS[row].freq, instrument, 0.3);
+      const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+      if (cell) cell.classList.add('playing');
+    }
+  }
+}
+
+function stop() {
+  isPlaying = false;
+  document.getElementById('status-text').textContent = 'parado';
+  document.getElementById('status-text').className = 'stopped';
+  if (intervalId) clearInterval(intervalId);
+  intervalId = null;
+  document.querySelectorAll('.cell.playing').forEach(c => c.classList.remove('playing'));
+}
+
+/* ======================================================
+   TECLADO VIRTUAL
+   ====================================================== */
+function buildKeyboard() {
+  const keysEl = document.getElementById('keys');
+  keysEl.innerHTML = '';
+  const whiteKeys = NOTAS.filter(n => !n.black);
+  whiteKeys.forEach((nota, i) => {
+    const key = document.createElement('div');
+    key.className = 'key';
+    key.textContent = nota.nome;
+    key.dataset.nota = nota.nome;
+    key.addEventListener('mousedown', () => pressKey(nota));
+    key.addEventListener('mouseup', () => releaseKey(nota));
+    keysEl.appendChild(key);
+  });
+  // sustenidos por cima
+  let blackIdx = 0;
+  const blackPositions = [0.7, 1.7, 3.7, 4.7, 5.7];  // posicoes aproximadas
+  // Simplificado: nao usamos posicoes absolutas, usamos uma abordagem alternativa
+  // Para simplicidade, omitimos teclas pretas no virtual ou usamos abordagem basica
+}
+
+function pressKey(nota) {
+  ensureAudio();
+  playNote(nota.freq, document.getElementById('instrument').value, 0.3);
+  document.querySelector(`.key[data-nota="${nota.nome}"]`)?.classList.add('active');
+}
+function releaseKey(nota) {
+  document.querySelector(`.key[data-nota="${nota.nome}"]`)?.classList.remove('active');
+}
+
+/* ======================================================
+   PRESETS
+   ====================================================== */
+function buildPresets() {
+  const el = document.getElementById('presets');
+  el.innerHTML = '';
+  PRESETS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'preset-card';
+    card.innerHTML = `
+      <div class="icon">${p.icon}</div>
+      <div class="name">${p.nome}</div>
+      <div class="bpm">${p.bpm} BPM</div>
+    `;
+    card.addEventListener('click', () => loadPreset(p));
+    el.appendChild(card);
+  });
+}
+
+function loadPreset(preset) {
+  document.getElementById('bpm').value = preset.bpm;
+  document.getElementById('bpm-display').textContent = preset.bpm;
+  grid = {};
+  if (preset.notas.length === 0) {
+    // Random Funk -> gerar
+    const count = 16;
+    for (let i = 0; i < count; i++) {
+      const row = Math.floor(Math.random() * NOTAS.length);
+      grid[`${row},${i % cols}`] = true;
+    }
+  } else {
+    preset.notas.forEach(([row, col]) => grid[`${row},${col % cols}`] = true);
+  }
+  buildGrid();
+  updateSeqDisplay();
+}
+
+/* ======================================================
+   SEQUENCE DISPLAY
+   ====================================================== */
+function updateSeqDisplay() {
+  const container = document.getElementById('seq-rows');
+  container.innerHTML = '';
+  const noteCount = Object.keys(grid).length;
+  document.getElementById('seq-info').textContent =
+    noteCount === 0 ? 'Sem notas' :
+    `${noteCount} nota${noteCount > 1 ? 's' : ''} colocada${noteCount > 1 ? 's' : ''}`;
+
+  // Agrupa por linha
+  const byRow = {};
+  for (const key in grid) {
+    const [row, col] = key.split(',').map(Number);
+    if (!byRow[row]) byRow[row] = [];
+    byRow[row].push(col);
+  }
+
+  NOTAS.slice().reverse().forEach((nota, idx) => {
+    const rowIdx = NOTAS.length - 1 - idx;
+    if (!byRow[rowIdx]) return;
+    const row = document.createElement('div');
+    row.className = 'seq-row';
+    row.innerHTML = `<div class="label">${nota.nome}</div>`;
+    for (let c = 0; c < cols; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'seq-cell' + (byRow[rowIdx].includes(c) ? ' on' : '');
+      cell.textContent = byRow[rowIdx].includes(c) ? '●' : '';
+      row.appendChild(cell);
+    }
+    container.appendChild(row);
+  });
+}
+
+/* ======================================================
+   SAVE / LOAD / EXPORT
+   ====================================================== */
+function saveCurrent() {
+  const name = prompt('Nome para guardar a sequencia:');
+  if (!name) return;
+  savedSequences[name] = {
+    grid,
+    bpm: parseInt(document.getElementById('bpm').value),
+    instrument: document.getElementById('instrument').value
+  };
+  localStorage.setItem('seqs', JSON.stringify(savedSequences));
+  alert(`Guardado como "${name}"`);
+}
+
+function loadSaved() {
+  const names = Object.keys(savedSequences);
+  if (names.length === 0) {
+    alert('Nao ha sequencias guardadas.');
+    return;
+  }
+  const name = prompt('Sequencias disponiveis:\n' + names.join('\n') + '\n\nQual queres carregar?');
+  if (!name || !savedSequences[name]) return;
+  const seq = savedSequences[name];
+  grid = seq.grid;
+  document.getElementById('bpm').value = seq.bpm;
+  document.getElementById('bpm-display').textContent = seq.bpm;
+  document.getElementById('instrument').value = seq.instrument;
+  buildGrid();
+  updateSeqDisplay();
+}
+
+function exportJSON() {
+  const data = {
+    grid,
+    bpm: parseInt(document.getElementById('bpm').value),
+    instrument: document.getElementById('instrument').value,
+    cols
+  };
+  const json = JSON.stringify(data, null, 2);
+  showModal('Exportar JSON', json, (txt) => {
+    navigator.clipboard.writeText(txt);
+    alert('Copiado para a area de transferencia!');
+    closeModal();
+  });
+}
+
+function importJSON() {
+  showModal('Importar JSON (cola o JSON aqui)', '', (txt) => {
+    try {
+      const data = JSON.parse(txt);
+      grid = data.grid || {};
+      if (data.bpm) document.getElementById('bpm').value = data.bpm;
+      if (data.instrument) document.getElementById('instrument').value = data.instrument;
+      if (data.cols && data.cols !== cols) {
+        cols = data.cols;
+        document.getElementById('cols').value = cols;
+      }
+      buildGrid();
+      updateSeqDisplay();
+      closeModal();
+    } catch (e) {
+      alert('JSON invalido: ' + e.message);
+    }
+  });
+}
+
+function showModal(title, text, callback) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-text').value = text;
+  document.getElementById('modal').classList.add('ativo');
+  modalCallback = callback;
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('ativo');
+  modalCallback = null;
+}
+
+document.getElementById('modal-cancel').addEventListener('click', closeModal);
+document.getElementById('modal-confirm').addEventListener('click', () => {
+  if (modalCallback) modalCallback(document.getElementById('modal-text').value);
+});
+
+/* ======================================================
+   VISUALIZADOR
+   ====================================================== */
+function startVisualizer() {
+  const canvas = document.getElementById('viz');
+  const ctx = canvas.getContext('2d');
+  function resize() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    requestAnimationFrame(draw);
+    if (!analyser) return;
+    const buf = new Uint8Array(analyser.fftSize);
+    analyser.getByteTimeDomainData(buf);
+    ctx.fillStyle = '#0a0a14';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Grid
+    ctx.strokeStyle = 'rgba(179, 136, 255, 0.1)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += 20) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+
+    // Waveform
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#b388ff';
+    ctx.shadowColor = '#b388ff';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    const slice = canvas.width / buf.length;
+    let x = 0;
+    for (let i = 0; i < buf.length; i++) {
+      const v = buf[i] / 128.0;
+      const y = (v * canvas.height) / 2;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+      x += slice;
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+  draw();
+}
+
+/* ======================================================
+   EVENTOS
+   ====================================================== */
+document.getElementById('play').addEventListener('click', play);
+document.getElementById('stop').addEventListener('click', stop);
+document.getElementById('clear').addEventListener('click', clearGrid);
+document.getElementById('randomize').addEventListener('click', randomizeGrid);
+document.getElementById('save').addEventListener('click', saveCurrent);
+document.getElementById('load').addEventListener('click', loadSaved);
+document.getElementById('export').addEventListener('click', exportJSON);
+document.getElementById('import').addEventListener('click', importJSON);
+
+document.getElementById('bpm').addEventListener('input', e => {
+  document.getElementById('bpm-display').textContent = e.target.value;
+  if (isPlaying) { stop(); play(); }
+});
+document.getElementById('volume').addEventListener('input', e => {
+  document.getElementById('volume-display').textContent = e.target.value;
+  if (masterGain) masterGain.gain.value = e.target.value / 100;
+});
+document.getElementById('cols').addEventListener('change', e => {
+  cols = parseInt(e.target.value);
+  buildGrid();
+  updateSeqDisplay();
+});
+
+// Teclado do computador (qwerty)
+document.addEventListener('keydown', e => {
+  if (e.repeat) return;
+  const key = e.key.toLowerCase();
+  if (KEY_MAP[key] !== undefined) {
+    const idx = KEY_MAP[key];
+    const nota = NOTAS[idx];
+    pressKey(nota);
+    // adiciona nota na grid na coluna atual de play
+    if (isPlaying) {
+      grid[`${idx},${currentStep}`] = true;
+      buildGrid();
+    }
+  }
+  if (e.key === ' ') {
+    e.preventDefault();
+    if (isPlaying) stop(); else play();
+  }
+});
+document.addEventListener('keyup', e => {
+  const key = e.key.toLowerCase();
+  if (KEY_MAP[key] !== undefined) {
+    releaseKey(NOTAS[KEY_MAP[key]]);
+  }
+});
+
+/* ======================================================
+   INIT
+   ====================================================== */
+buildGrid();
+buildKeyboard();
+buildPresets();
+updateSeqDisplay();
+
+// Mensagem na consola
+console.log('%c🎵 Criador de Música carregado', 'color:#b388ff;font-size:16px');
+console.log('Toca um preset ou clica nas células para começar.');
+</script>
+
+</body>
+</html>

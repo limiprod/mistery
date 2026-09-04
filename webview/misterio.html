@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>∞ O Limiar ∞</title>
+<style>
+  :root {
+    --bg: #05060a;
+    --fg: #d8d8e8;
+    --dim: #555;
+    --glow: #b388ff;
+    --blood: #ff4d6d;
+    --galaxy: #6f00ff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* Fundo de estrelas */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, white, transparent),
+      radial-gradient(1px 1px at 80% 70%, white, transparent),
+      radial-gradient(1px 1px at 50% 50%, var(--glow), transparent),
+      radial-gradient(2px 2px at 10% 80%, white, transparent),
+      radial-gradient(1px 1px at 90% 10%, var(--glow), transparent),
+      radial-gradient(1px 1px at 60% 20%, white, transparent),
+      radial-gradient(1px 1px at 30% 90%, white, transparent),
+      radial-gradient(1px 1px at 70% 40%, white, transparent);
+    background-size: 200% 200%;
+    animation: drift 60s linear infinite;
+    z-index: -2;
+    opacity: 0.6;
+  }
+
+  @keyframes drift {
+    from { background-position: 0% 0%; }
+    to   { background-position: 200% 200%; }
+  }
+
+  /* Nebulosa que muda de cor */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(111, 0, 255, 0.15), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(255, 77, 109, 0.1), transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(179, 136, 255, 0.08), transparent 50%);
+    z-index: -1;
+    animation: nebula 15s ease-in-out infinite alternate;
+  }
+
+  @keyframes nebula {
+    from { filter: hue-rotate(0deg); }
+    to   { filter: hue-rotate(120deg); }
+  }
+
+  main {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 60px 30px;
+  }
+
+  h1 {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 10px;
+    color: transparent;
+    background: linear-gradient(90deg, var(--glow), var(--blood), var(--galaxy));
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+    background-size: 200% 100%;
+    user-select: none;
+  }
+
+  @keyframes shimmer {
+    from { background-position: 0% 50%; }
+    to   { background-position: 200% 50%; }
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--dim);
+    font-style: italic;
+    margin-bottom: 60px;
+  }
+
+  p {
+    line-height: 1.8;
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+  }
+
+  /* Misterio 1: Texto clicavel que abre uma aba secreta */
+  .segredo {
+    color: var(--glow);
+    cursor: pointer;
+    border-bottom: 1px dashed var(--glow);
+    transition: all 0.3s;
+  }
+  .segredo:hover {
+    color: var(--blood);
+    border-color: var(--blood);
+    text-shadow: 0 0 8px var(--blood);
+  }
+
+  /* Secção escondida */
+  .oculto {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 1s ease, opacity 1s ease;
+    border-left: 2px solid var(--blood);
+    padding: 0 20px;
+    margin: 20px 0;
+    background: rgba(255, 77, 109, 0.04);
+  }
+  .oculto.aberto {
+    max-height: 1000px;
+    opacity: 1;
+    padding: 20px;
+  }
+
+  /* Misterio 2: Alfabeto galatico */
+  .galatico {
+    font-family: 'Wingdings', 'Webdings', 'Symbola', cursive;
+    letter-spacing: 0.3em;
+    color: var(--glow);
+    text-shadow: 0 0 4px var(--glow);
+  }
+
+  /* Misterio 3: Contador de cliques */
+  #contador {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+    color: var(--dim);
+    z-index: 100;
+  }
+
+  /* Morcegos */
+  .morcego {
+    position: fixed;
+    pointer-events: none;
+    font-size: 2rem;
+    z-index: 99;
+    animation: voar 6s linear forwards;
+    opacity: 0;
+  }
+
+  @keyframes voar {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(0deg) scale(0.5);
+    }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1);
+    }
+  }
+
+  /* Container de morcegos flappy */
+  #morcegos-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  /* Piscar texto */
+  .piscar {
+    animation: piscar 2s steps(2) infinite;
+  }
+  @keyframes piscar {
+    50% { opacity: 0.3; }
+  }
+
+  /* Texto que aparece devagar */
+  .revelar {
+    opacity: 0;
+    transition: opacity 2s;
+    cursor: help;
+  }
+  .revelar.mostrar { opacity: 1; }
+
+  /* Console fake */
+  #console {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.85);
+    border: 1px solid var(--glow);
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    color: var(--glow);
+    max-width: 300px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  #console.mostrar { opacity: 1; }
+
+  /* Cursor personalizado que muda */
+  .cursor-area {
+    padding: 30px;
+    border: 1px dashed transparent;
+    margin: 20px 0;
+    transition: all 0.5s;
+  }
+  .cursor-area:hover {
+    border-color: var(--glow);
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><text y='20' font-size='20'>🔮</text></svg>") 12 12, auto;
+  }
+
+  /* Tabela de simbolos galacticos */
+  .tabela-galatica {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 8px;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(111, 0, 255, 0.05);
+    border-radius: 8px;
+  }
+  .simbolo {
+    text-align: center;
+    padding: 8px;
+    font-size: 1.5rem;
+    color: var(--glow);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .simbolo:hover {
+    transform: scale(1.4) rotate(10deg);
+    color: var(--blood);
+  }
+
+  /* Coração que bate */
+  .bater {
+    display: inline-block;
+    color: var(--blood);
+    animation: bat 1s ease-in-out infinite;
+  }
+  @keyframes bat {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.3); }
+  }
+
+  /* Codigo que se copia */
+  .copy-block {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 4px;
+    font-family: monospace;
+    user-select: all;
+    margin: 15px 0;
+  }
+
+  /* Mensagem que se move */
+  .mensagem-movel {
+    position: fixed;
+    pointer-events: none;
+    color: var(--blood);
+    text-shadow: 0 0 10px var(--blood);
+    font-weight: bold;
+    font-size: 1.2rem;
+    animation: fugir 4s ease-in-out forwards;
+    z-index: 200;
+  }
+  @keyframes fugir {
+    0%   { opacity: 0; transform: scale(0.5); }
+    20%  { opacity: 1; }
+    100% { opacity: 0; transform: scale(2); }
+  }
+
+  /* Modal secreto */
+  #modal-secreto {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    cursor: pointer;
+  }
+  #modal-secreto.ativo { display: flex; }
+  #modal-secreto .conteudo {
+    text-align: center;
+    color: var(--glow);
+    font-size: 1.5rem;
+    animation: girar 3s linear infinite;
+  }
+  @keyframes girar {
+    from { transform: rotate(0); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Audio button */
+  button {
+    background: transparent;
+    color: var(--glow);
+    border: 1px solid var(--glow);
+    padding: 8px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s;
+  }
+  button:hover {
+    background: var(--glow);
+    color: var(--bg);
+    box-shadow: 0 0 20px var(--glow);
+  }
+
+  /* Pequena area com texto que muda */
+  #mensagem-mutavel {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--dim);
+    min-height: 24px;
+    margin: 20px 0;
+  }
+
+  .separador {
+    text-align: center;
+    color: var(--dim);
+    margin: 40px 0;
+    letter-spacing: 1em;
+  }
+
+  /* Texto glitch */
+  .glitch {
+    position: relative;
+    display: inline-block;
+  }
+  .glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+  .glitch::before {
+    color: var(--blood);
+    animation: glitch1 2s infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+  }
+  .glitch::after {
+    color: var(--glow);
+    animation: glitch2 2s infinite;
+    clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+  }
+  @keyframes glitch1 {
+    0%, 100% { transform: translate(0); }
+    33%      { transform: translate(-3px, 1px); }
+    66%      { transform: translate(2px, -1px); }
+  }
+  @keyframes glitch2 {
+    0%, 100% { transform: translate(0); }
+    33%      { transform: translate(3px, -1px); }
+    66%      { transform: translate(-2px, 1px); }
+  }
+</style>
+</head>
+<body>
+
+<div id="contador">visitas: <span id="visitas">1</span> · cliques: <span id="cliques">0</span></div>
+
+<div id="morcegos-container"></div>
+
+<div id="console"></div>
+
+<div id="modal-secreto">
+  <div class="conteudo">✦ ENCONTRASTE O VAZIO ✦<br><br>clica para fechar</div>
+</div>
+
+<main>
+
+  <h1 class="glitch" data-text="O Limiar">O Limiar</h1>
+  <p class="subtitle piscar">entre a luz e o que resta dela</p>
+
+  <p>Bem-vindo a um espaço que <span class="segredo" id="segredo1">não deveria existir</span>. Cada palavra aqui foi colocada com intenção. Cada silêncio também.</p>
+
+  <p>Se leres devagar, talvez <span class="revelar" data-msg="o texto te leia a ti.">o texto te leia a ti.</span></p>
+
+  <div class="oculto" id="aba-secreta">
+    <p style="color: var(--blood);">⌬ Bem-vindo ao lado de dentro ⌬</p>
+    <p>Encontraste a primeira porta. Há mais. Algumas só se abrem com a sequência antiga: ↑↑↓↓←→←→BA. Outras com paciência.</p>
+    <p>A partir daqui, cada sombra pode ter olhos. Continua.</p>
+  </div>
+
+  <p class="galatico" title="Passe aqui para traduzir">⌬⎈�⎇⏃⌭⎅⎍⌿⌗⏁⏄⌖⌭⎍⌭⌭⎈⏁�</p>
+
+  <p>No escuro, há coisas que se movem. Não as vês, mas <span class="segredo" id="segredo2">sentes</span> quando te observam.</p>
+
+  <p>Conta as letras: <span class="segredo" id="contador-letras">a primeira, a quinta, a nona</span>. Juntas formam uma palavra.</p>
+
+  <p class="cursor-area">
+    Esta área guarda um segredo menor. Passa o rato. O cursor transforma-se. A página lembra-se.
+  </p>
+
+  <p>Em certas noites, o céu <span class="segredo" id="segredo3">cai devagar</span>. Outras vezes, é o contrário — e o que cai somos nós.</p>
+
+  <p class="separador">⌬ · ⌬ · ⌬</p>
+
+  <h2 style="text-align: center; margin-bottom: 20px;">Tabela Galáctica</h2>
+  <p>Cada símbolo tem um significado que se perdeu. Clica em alguns.</p>
+  <div class="tabela-galatica" id="tabela"></div>
+
+  <p id="mensagem-mutavel"></p>
+
+  <p>Copia este código e leva-o contigo:</p>
+  <div class="copy-block" id="copy-code">42-OMEGA-31337-NULL</div>
+
+  <p>Carrega no <span class="bater">♥</span> para ouvir o pulso do vazio:</p>
+  <div style="text-align: center;">
+    <button id="btn-pulso">♥ pulsar</button>
+    <button id="btn-morcegos">liberar os morcegos</button>
+    <button id="btn-void">invocar o vazio</button>
+	<button onclick="chrome.webview.postMessage('home')">sair</button>
+  </div>
+
+  <p style="text-align: center; margin-top: 50px; color: var(--dim); font-size: 0.85rem;">
+    Última atualização: nunca. Próxima atualização: talvez.
+  </p>
+
+</main>
+
+<script>
+/* =========================================================
+   Misterio 1 - Console log na abertura
+   ========================================================= */
+console.log('%c☾ O Limiar ☽', 'color:#b388ff;font-size:24px;font-family:monospace');
+console.log('%cSe estás a ler isto, já és parte do enigma.', 'color:#ff4d6d;font-style:italic');
+console.log('%cTenta: ↑↑↓↓←→←→BA', 'color:#555');
+console.log('%cOu: clica no título 7 vezes.', 'color:#555');
+
+/* =========================================================
+   Misterio 2 - Texto clicavel que abre a aba secreta
+   ========================================================= */
+document.getElementById('segredo1').addEventListener('click', () => {
+  document.getElementById('aba-secreta').classList.toggle('aberto');
+});
+
+document.getElementById('segredo2').addEventListener('click', () => {
+  spawnMorcegos(8);
+  mostrarConsole('Eles vieram.');
+});
+
+document.getElementById('segredo3').addEventListener('click', () => {
+  mostrarConsole('O céu não cai. Nós é que subimos demasiado.');
+});
+
+/* =========================================================
+   Misterio 3 - Contador de letras (5, 1, 9 -> SLI?)
+   a primeira letra de cada palavra na frase
+   "a primeira, a quinta, a nona" -> a, q, a -> "aqa"?
+   Melhor: pega na 1ª, 5ª e 9ª letra do texto visivel
+   ========================================================= */
+document.getElementById('contador-letras').addEventListener('click', () => {
+  const texto = "a primeira a quinta a nona";
+  const indices = [0, 4, 8]; // 1ª, 5ª, 9ª (zero-based)
+  let palavra = '';
+  indices.forEach(i => { if (texto[i]) palavra += texto[i]; });
+  mostrarConsole(`Letras reveladas: "${palavra.toUpperCase()}" — não era isto que esperavas, era?`);
+});
+
+/* =========================================================
+   Misterio 4 - Codigo Konami
+   ========================================================= */
+const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx = 0;
+document.addEventListener('keydown', e => {
+  const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  if (k === konami[konamiIdx] || e.key === konami[konamiIdx]) {
+    konamiIdx++;
+    if (konamiIdx === konami.length) {
+      konamiIdx = 0;
+      spawnMorcegos(50);
+      mostrarConsole('↑↑↓↓←→←→BA  ·  sequência antiga reconhecida');
+      document.getElementById('modal-secreto').classList.add('ativo');
+      // Confetti galactico
+      for (let i = 0; i < 100; i++) {
+        const p = document.createElement('div');
+        p.className = 'mensagem-movel';
+        p.textContent = '✦';
+        p.style.left = Math.random() * window.innerWidth + 'px';
+        p.style.top = Math.random() * window.innerHeight + 'px';
+        p.style.fontSize = (Math.random() * 30 + 10) + 'px';
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 4000);
+      }
+    }
+  } else {
+    konamiIdx = 0;
+  }
+});
+
+document.getElementById('modal-secreto').addEventListener('click', () => {
+  document.getElementById('modal-secreto').classList.remove('ativo');
+});
+
+/* =========================================================
+   Misterio 5 - 7 cliques no titulo
+   ========================================================= */
+const titulo = document.querySelector('h1');
+let cliquesTitulo = 0;
+titulo.addEventListener('click', () => {
+  cliquesTitulo++;
+  if (cliquesTitulo === 7) {
+    cliquesTitulo = 0;
+    document.body.style.setProperty('--glow', '#ff4d6d');
+    mostrarConsole('O título sangrou. Cor alterada.');
+    setTimeout(() => document.body.style.setProperty('--glow', '#b388ff'), 5000);
+  }
+});
+
+/* =========================================================
+   Misterio 6 - Contador de cliques global
+   ========================================================= */
+const cliquesEl = document.getElementById('cliques');
+document.addEventListener('click', () => {
+  const n = parseInt(cliquesEl.textContent) + 1;
+  cliquesEl.textContent = n;
+  if (n === 100) mostrarConsole('Já clicaste 100 vezes. Porquê?');
+  if (n === 333) mostrarConsole('333. O número do vazio parcial.');
+  if (n === 666) {
+    mostrarConsole('666 ⚠ O código está corrompido');
+    spawnMorcegos(20);
+  }
+  if (n === 1000) {
+    mostrarConsole('✦ 1000 cliques. A página é tua agora. ✦');
+    document.body.style.filter = 'invert(1) hue-rotate(180deg)';
+    setTimeout(() => document.body.style.filter = '', 3000);
+  }
+});
+
+/* =========================================================
+   Misterio 7 - Visita unica (localStorage)
+   ========================================================= */
+const visitas = parseInt(localStorage.getItem('visitas') || '0') + 1;
+localStorage.setItem('visitas', visitas);
+document.getElementById('visitas').textContent = visitas;
+if (visitas === 1) mostrarConsole('Primeira visita. Tudo é novo.');
+else if (visitas === 7) mostrarConsole('Voltaste pela 7ª vez. Já não és casual.');
+else if (visitas === 13) { mostrarConsole('13. Já és nosso.'); spawnMorcegos(13); }
+else if (visitas % 100 === 0) mostrarConsole(`Visita nº${visitas}. Persistente.`);
+
+/* =========================================================
+   Misterio 8 - Texto que aparece devagar ao scroll
+   ========================================================= */
+const revelars = document.querySelectorAll('.revelar');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('mostrar');
+      e.target.textContent = e.target.dataset.msg;
+    }
+  });
+});
+revelars.forEach(r => observer.observe(r));
+
+/* =========================================================
+   Misterio 9 - Copiar texto secreto
+   ========================================================= */
+document.getElementById('copy-code').addEventListener('click', () => {
+  navigator.clipboard.writeText('42-OMEGA-31337-NULL').then(() => {
+    mostrarConsole('Código copiado. Leva-o contigo.');
+  });
+});
+
+/* =========================================================
+   Misterio 10 - Tabela galactica
+   ========================================================= */
+const simbolos = ['⌬','⎈','⍟','⎇','⏃','⌭','⎅','⎍','⌿','⌗','⏁','⏄','⌖','✦','✧','☉','☽','☾','♆','♇','⚛','✺','✹','❂','✪','⚹','⚝','⛧','⚸','⟁'];
+const tabela = document.getElementById('tabela');
+simbolos.forEach(s => {
+  const d = document.createElement('div');
+  d.className = 'simbolo';
+  d.textContent = s;
+  d.addEventListener('click', () => {
+    mostrarConsole(`Símbolo ${s} decodificado: "${decodificar(s)}"`);
+    spawnMorcegos(1);
+  });
+  tabela.appendChild(d);
+});
+
+function decodificar(s) {
+  const mapa = {
+    '⌬':'silêncio','⎈':'vigília','⍟':'origem','⎇':'caminho','⏃':'entrada',
+    '⌭':'espelho','⎅':'verdade','⎍':'memória','⌿':'esquecimento','⌗':'sombra',
+    '⏁':'vazio','⏄':'pulso','⌖':'círculo','✦':'estrela','✧':'poeira',
+    '☉':'sol','☽':'lua','☾':'eclipse','♆':'profundeza','♇':'limiar',
+    '⚛':'átomo','✺':'chama','✹':'espinho','❂':'olho','✪':'sinal',
+    '⚹':'rotação','⚝':'constelação','⛧':'alerta','⚸':'morte','⟁':'trono'
+  };
+  return mapa[s] || 'indecifrável';
+}
+
+/* =========================================================
+   Misterio 11 - Mensagens que mudam aleatoriamente
+   ========================================================= */
+const mensagens = [
+  'O relógio parou às 03:13.',
+  'Há alguém no canto do ecrã. Olha.',
+  'Não é um bug. É uma porta.',
+  'O alfabeto galáctico foi decifrado em 1923.',
+  'Os morcegos só aparecem quando ninguém os vê.',
+  'Clica sete vezes. Sempre sete.',
+  'A próxima mensagem é a última.',
+  'Não havia uma próxima mensagem.',
+  'Voltaste a verificar.',
+  'O ecrã está a olhar para ti também.',
+];
+const msgEl = document.getElementById('mensagem-mutavel');
+let msgIdx = 0;
+setInterval(() => {
+  msgIdx = (msgIdx + 1) % mensagens.length;
+  msgEl.textContent = mensagens[msgIdx];
+  msgEl.style.color = `hsl(${Math.random()*360}, 70%, 70%)`;
+}, 3500);
+
+/* =========================================================
+   Misterio 12 - Morcegos
+   ========================================================= */
+const batContainer = document.getElementById('morcegos-container');
+function spawnMorcegos(qtd = 1) {
+  for (let i = 0; i < qtd; i++) {
+    const b = document.createElement('div');
+    b.className = 'morcego';
+    b.textContent = Math.random() < 0.9 ? '🦇' : ['🦇','🦇','🦇','🦇','�','✦'][Math.floor(Math.random()*6)];
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight;
+    b.style.left = x + 'px';
+    b.style.top = y + 'px';
+    const dx = (Math.random() - 0.5) * 800;
+    const dy = (Math.random() - 0.5) * 800;
+    const rot = (Math.random() - 0.5) * 720;
+    b.style.setProperty('--dx', dx + 'px');
+    b.style.setProperty('--dy', dy + 'px');
+    b.style.setProperty('--rot', rot + 'deg');
+    batContainer.appendChild(b);
+    setTimeout(() => b.remove(), 6000);
+  }
+}
+
+document.getElementById('btn-morcegos').addEventListener('click', () => spawnMorcegos(20));
+
+/* Morcego aleatorio de vez em quando */
+setInterval(() => {
+  if (Math.random() < 0.3) spawnMorcegos(1);
+}, 8000);
+
+/* =========================================================
+   Misterio 13 - Pulso sonoro (sintetizado em JS)
+   ========================================================= */
+let audioCtx;
+document.getElementById('btn-pulso').addEventListener('click', () => {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 1);
+  gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 1);
+});
+
+/* =========================================================
+   Misterio 14 - Invocar o vazio
+   ========================================================= */
+document.getElementById('btn-void').addEventListener('click', () => {
+  spawnMorcegos(40);
+  mostrarConsole('☾ O vazio respondeu ☽');
+  document.body.style.animation = 'nebula 1s ease-in-out infinite';
+  setTimeout(() => document.body.style.animation = '', 5000);
+});
+
+/* =========================================================
+   Misterio 15 - Mensagem ao sair (ou mudar de aba)
+   ========================================================= */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    document.title = '☾ … ☽';
+  } else {
+    document.title = '∞ O Limiar ∞';
+  }
+});
+
+/* =========================================================
+   Misterio 16 - Atalho de teclado secreto (clica H)
+   ========================================================= */
+document.addEventListener('keydown', e => {
+  if (e.key.toLowerCase() === 'h' && !e.ctrlKey && !e.altKey) {
+    mostrarConsole('Ajuda? Não há ajuda. Só portas.');
+  }
+});
+
+/* =========================================================
+   Misterio 17 - Hora muda o ceu
+   ========================================================= */
+const hora = new Date().getHours();
+if (hora >= 0 && hora < 5) {
+  document.body.style.setProperty('--bg', '#000');
+  mostrarConsole('São horas mortas. A página escureceu para te fazer companhia.');
+}
+
+/* =========================================================
+   Util
+   ========================================================= */
+function mostrarConsole(msg) {
+  const c = document.getElementById('console');
+  c.textContent = '> ' + msg;
+  c.classList.add('mostrar');
+  clearTimeout(c._t);
+  c._t = setTimeout(() => c.classList.remove('mostrar'), 5000);
+}
+
+/* Prevenir right-click no h1 */
+titulo.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  mostrarConsole('O título guarda-se. Não se copia.');
+});
+</script>
+
+</body>
+</html>

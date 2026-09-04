@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Criativo — Design que transforma ideias em realidade</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --light: #f8fafc;
+            --white: #ffffff;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--white);
+        }
+
+        /* Navegação */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            background: linear-gradient(135deg, #eef2ff 0%, #fce7f3 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.2), transparent 70%);
+            top: -100px;
+            right: -100px;
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.2), transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--gray);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--dark);
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Seções */
+        section {
+            padding: 5rem 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--gray);
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Serviços */
+        #servicos {
+            background: var(--light);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: var(--white);
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+            border-color: transparent;
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+        }
+
+        .service-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .service-card p {
+            color: var(--gray);
+        }
+
+        /* Sobre */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-image::before {
+            content: '✨';
+            position: absolute;
+            font-size: 15rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.3;
+        }
+
+        .about-text h3 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-text p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+
+        /* Contato */
+        #contato {
+            background: var(--light);
+        }
+
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: var(--white);
+            padding: 3rem 2rem 1.5rem;
+            text-align: center;
+        }
+
+        footer p {
+            color: #94a3b8;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .contact-form {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* Easter Egg - Jogo 3D */
+        .easter-hint {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: rgba(15, 23, 42, 0.8);
+            color: #94a3b8;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-family: monospace;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+
+        .easter-hint.show {
+            opacity: 1;
+        }
+
+        #game-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            display: none;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+
+        #game-overlay.active {
+            display: block;
+        }
+
+        #game-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .game-hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ffff;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .game-hud div {
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        .game-hud .label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .game-hud .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+        }
+
+        .game-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(0, 255, 255, 0.7);
+            font-size: 0.85rem;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .game-controls kbd {
+            background: rgba(0, 255, 255, 0.15);
+            border: 1px solid #00ffff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin: 0 2px;
+        }
+
+        .game-exit {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 0, 80, 0.15);
+            border: 2px solid #ff0050;
+            color: #ff0050;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            text-shadow: 0 0 10px #ff0050;
+            transition: all 0.2s;
+        }
+
+        .game-exit:hover {
+            background: #ff0050;
+            color: #000;
+            box-shadow: 0 0 20px #ff0050;
+        }
+
+        .game-start-screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(99, 0, 255, 0.2), transparent 70%);
+            z-index: 20;
+        }
+
+        .game-start-screen h1 {
+            font-size: 5rem;
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff;
+            letter-spacing: 8px;
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .game-start-screen h2 {
+            font-size: 2rem;
+            color: #ff00ff;
+            text-shadow: 0 0 15px #ff00ff;
+            margin-bottom: 3rem;
+        }
+
+        .game-start-screen .start-btn {
+            background: transparent;
+            border: 3px solid #00ffff;
+            color: #00ffff;
+            padding: 1.2rem 3rem;
+            font-size: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px #00ffff;
+            transition: all 0.3s;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .game-start-screen .start-btn:hover {
+            background: #00ffff;
+            color: #000;
+            box-shadow: 0 0 30px #00ffff;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff; }
+            to { text-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff, 0 0 80px #ff00ff; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .game-over {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 20;
+        }
+
+        .game-over.active {
+            display: flex;
+        }
+
+        .game-over h2 {
+            font-size: 4rem;
+            color: #ff0050;
+            text-shadow: 0 0 20px #ff0050;
+            margin-bottom: 1rem;
+        }
+
+        .game-over .score-final {
+            font-size: 2rem;
+            color: #00ffff;
+            text-shadow: 0 0 15px #00ffff;
+            margin-bottom: 2rem;
+        }
+
+        .game-over button {
+            background: transparent;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            padding: 1rem 2.5rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 3px;
+            margin: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .game-over button:hover {
+            background: #00ffff;
+            color: #000;
+        }
+
+        body.game-mode {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegação -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Studio.</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#servicos">Serviços</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#contato">Contato</a></li>
+				<li><a href="#" onclick="chrome.webview.postMessage('home')">Sair</a></li>
+            </ul>
+            <button class="menu-toggle">☰</button>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <span class="hero-badge">✨ Bem-vindo ao futuro do design</span>
+            <h1>Design que <span>transforma</span> ideias em realidade</h1>
+            <p>Criamos experiências digitais memoráveis que conectam marcas aos seus clientes de forma autêntica e impactante.</p>
+            <div class="hero-buttons">
+                <a href="#contato" class="btn btn-primary">Começar projeto</a>
+                <a href="#servicos" class="btn btn-secondary">Ver serviços</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Serviços -->
+    <section id="servicos">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nossos Serviços</h2>
+                <p>Soluções criativas completas para impulsionar o seu negócio no mundo digital.</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🎨</div>
+                    <h3>Design UI/UX</h3>
+                    <p>Interfaces intuitivas e belas que encantam os usuários e aumentam conversões.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">💻</div>
+                    <h3>Desenvolvimento Web</h3>
+                    <p>Sites e aplicações web rápidas, responsivas e otimizadas para todos os dispositivos.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">�</div>
+                    <h3>Aplicativos Mobile</h3>
+                    <p>Apps nativos e multiplataforma que oferecem experiências fluidas em qualquer tela.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🚀</div>
+                    <h3>Branding</h3>
+                    <p>Identidade visual marcante que comunica os valores e a essência da sua marca.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">📈</div>
+                    <h3>Marketing Digital</h3>
+                    <p>Estratégias inteligentes para aumentar visibilidade, engajamento e resultados.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">⚡</div>
+                    <h3>Consultoria</h3>
+                    <p>Orientação especializada para alinhar tecnologia e estratégia ao seu negócio.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre -->
+    <section id="sobre">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-image"></div>
+                <div class="about-text">
+                    <h3>Somos um estúdio apaixonado por criar o futuro</h3>
+                    <p>Há mais de 10 anos no mercado, ajudamos empresas de todos os tamanhos a transformarem suas ideias em produtos digitais de sucesso.</p>
+                    <p>Nosso time é formado por designers, desenvolvedores e estrategistas que compartilham a mesma paixão: criar experiências que fazem diferença.</p>
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">Projetos</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">150+</div>
+                            <div class="stat-label">Clientes</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">10+</div>
+                            <div class="stat-label">Anos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contato -->
+    <section id="contato">
+        <div class="container">
+            <div class="section-header">
+                <h2>Vamos conversar?</h2>
+                <p>Conte-nos sobre seu projeto. Responderemos em até 24 horas.</p>
+            </div>
+            <form class="contact-form" onsubmit="event.preventDefault(); alert('Mensagem enviada! Entraremos em contato em breve.');">
+                <div class="form-group">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="mensagem">Mensagem</label>
+                    <textarea id="mensagem" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Enviar mensagem</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="social-links">
+                <a href="#" aria-label="Instagram">📷</a>
+                <a href="#" aria-label="LinkedIn">💼</a>
+                <a href="#" aria-label="Twitter">🐦</a>
+                <a href="#" aria-label="GitHub">💻</a>
+            </div>
+            <p>© 2026 Studio Criativo. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Easter Egg Hint -->
+    <div class="easter-hint" id="easterHint">↑↑↓↓↓↓→←→←BA</div>
+
+    <!-- Easter Egg - Jogo 3D de Corrida -->
+    <div id="game-overlay">
+        <canvas id="game-canvas"></canvas>
+
+        <div class="game-start-screen" id="gameStartScreen">
+            <h1>NEON RACER</h1>
+            <h2>Corrida no Estúdio</h2>
+            <button class="start-btn" id="startBtn">▶ START</button>
+        </div>
+
+        <div class="game-over" id="gameOverScreen">
+            <h2>GAME OVER</h2>
+            <div class="score-final">SCORE: <span id="finalScore">0</span></div>
+            <div>
+                <button id="restartBtn">REINICIAR</button>
+                <button id="exitBtn">SAIR</button>
+            </div>
+        </div>
+
+        <div class="game-hud" id="gameHud" style="display:none;">
+            <div>
+                <div class="label">VELOCIDADE</div>
+                <div class="value"><span id="speedValue">0</span> KM/H</div>
+            </div>
+            <div>
+                <div class="label">PONTUAÇÃO</div>
+                <div class="value"><span id="scoreValue">0</span></div>
+            </div>
+            <div>
+                <div class="label">DISTÂNCIA</div>
+                <div class="value"><span id="distanceValue">0</span> M</div>
+            </div>
+        </div>
+
+        <div class="game-controls" id="gameControls" style="display:none;">
+            <kbd>←</kbd> <kbd>→</kbd> ou <kbd>A</kbd> <kbd>D</kbd> para esterçar &nbsp;|&nbsp;
+            <kbd>↑</kbd> <kbd>↓</kbd> ou <kbd>W</kbd> <kbd>S</kbd> para acelerar/frear &nbsp;|&nbsp;
+            <kbd>ESPAÇO</kbd> boost
+        </div>
+
+        <button class="game-exit" id="exitGameBtn" style="display:none;">� SAIR (ESC)</button>
+    </div>
+
+    <!-- Three.js para o jogo 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // ================= MENU MOBILE =================
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        menuToggle.addEventListener('click', () => {
+            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+            if (navLinks.style.display === 'flex') {
+                navLinks.style.flexDirection = 'column';
+                navLinks.style.position = 'absolute';
+                navLinks.style.top = '100%';
+                navLinks.style.left = '0';
+                navLinks.style.right = '0';
+                navLinks.style.background = 'white';
+                navLinks.style.padding = '1rem 2rem';
+                navLinks.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+            }
+        });
+
+        // Scroll suave
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // ================= EASTER EGG - KONAMI CODE =================
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+                           'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+                           'b', 'a'];
+        let konamiIndex = 0;
+        const easterHint = document.getElementById('easterHint');
+
+        // Mostra dica ao clicar no logo 3 vezes
+        let logoClicks = 0;
+        document.querySelector('.logo').addEventListener('click', (e) => {
+            e.preventDefault();
+            logoClicks++;
+            if (logoClicks >= 3) {
+                easterHint.classList.add('show');
+                setTimeout(() => easterHint.classList.remove('show'), 5000);
+                logoClicks = 0;
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            const expected = konamiCode[konamiIndex].toLowerCase();
+            if (key === expected) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    konamiIndex = 0;
+                    easterHint.classList.remove('show');
+                    startGame();
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+
+        // ================= JOGO 3D =================
+        let gameState = 'idle'; // idle | playing | over
+        let scene, camera, renderer, clock;
+        let playerCar, roadSegments = [], obstacles = [], roadMarkings = [];
+        let roadZ = 0;
+        let playerX = 0;
+        let playerVelocity = 0;
+        let playerLateralVelocity = 0;
+        let baseSpeed = 60;
+        let boostSpeed = 0;
+        let score = 0;
+        let distance = 0;
+        let spawnTimer = 0;
+        let gameTime = 0;
+        let particles = [];
+
+        // ================= SINTETIZADOR SYNTHWAVE =================
+        let audioCtx = null;
+        let masterGain = null;
+        let musicNodes = []; // nós que devem ser parados ao sair
+        let musicRunning = false;
+        let musicScheduler = null;
+        let currentBPM = 120;
+        let targetBPM = 120;
+        let lowpassFilter = null;
+
+        function initAudio() {
+            if (audioCtx) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.4;
+
+            lowpassFilter = audioCtx.createBiquadFilter();
+            lowpassFilter.type = 'lowpass';
+            lowpassFilter.frequency.value = 1500;
+            lowpassFilter.Q.value = 5;
+
+            // Reverb simples com delay feedback
+            const delay = audioCtx.createDelay();
+            delay.delayTime.value = 0.18;
+            const feedback = audioCtx.createGain();
+            feedback.gain.value = 0.35;
+            const wet = audioCtx.createGain();
+            wet.gain.value = 0.25;
+
+            masterGain.connect(audioCtx.destination);
+            masterGain.connect(lowpassFilter);
+            lowpassFilter.connect(audioCtx.destination);
+            masterGain.connect(delay);
+            delay.connect(feedback);
+            feedback.connect(delay);
+            delay.connect(wet);
+            wet.connect(audioCtx.destination);
+        }
+
+        function playNote(freq, duration, type = 'sawtooth', vol = 0.15, dest = null) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+
+            const now = audioCtx.currentTime;
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(vol, now + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+            osc.connect(gain);
+            gain.connect(dest || masterGain);
+            osc.start(now);
+            osc.stop(now + duration + 0.05);
+        }
+
+        // Efeito de ruído (para hi-hat)
+        function playNoise(duration, vol = 0.08) {
+            if (!audioCtx) return;
+            const bufferSize = audioCtx.sampleRate * duration;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const gain = audioCtx.createGain();
+            const now = audioCtx.currentTime;
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.value = 5000;
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(masterGain);
+            noise.start(now);
+            noise.stop(now + duration);
+        }
+
+        // Notas - Escala menor harmônica synthwave (A minor)
+        const SCALE = [55, 58, 62.41, 65.41, 69.30, 73.42, 77.78, 82.41]; // A1 menor
+        // Bassline em Am - sequência icônica
+        const BASS_PATTERN = [55, 55, 65.41, 73.42, 55, 55, 69.30, 82.41];
+        // Arpejo
+        const ARP_PATTERN  = [110, 130.81, 164.81, 130.81, 110, 146.83, 174.61, 146.83];
+        // Lead (acordes)
+        const LEAD_PATTERN = [
+            [110, 130.81, 164.81], // Am
+            [110, 130.81, 164.81], // Am
+            [116.54, 138.59, 174.61], // Bm
+            [110, 130.81, 164.81], // Am
+            [98, 123.47, 146.83], // G
+            [98, 123.47, 146.83], // G
+            [103.83, 130.81, 164.81], // F
+            [110, 130.81, 164.81]  // Am
+        ];
+
+        let stepIndex = 0;
+
+        function musicTick() {
+            if (!musicRunning || !audioCtx) return;
+            const stepInBeat = stepIndex % 16;
+            const beat = Math.floor(stepInBeat / 4); // 0-3 (4 batidas por compasso)
+            const sixteenth = stepInBeat % 4;
+            const beatInterval = 60 / currentBPM / 4; // duração de 1/16
+
+            // === KICK nos tempos 0 e 2 ===
+            if (sixteenth === 0) {
+                playKick(beat === 0 || beat === 2 ? 1.0 : 0.6);
+            }
+
+            // === SNARE no tempo 1 e 3 ===
+            if (sixteenth === 0 && (beat === 1 || beat === 3)) {
+                playSnare();
+            }
+
+            // === HI-HAT a cada 1/8 ===
+            if (sixteenth === 0 || sixteenth === 2) {
+                playNoise(0.04, sixteenth === 2 ? 0.05 : 0.03);
+            }
+
+            // === BASSLINE a cada 1/4 ===
+            if (sixteenth === 0) {
+                const bassNote = BASS_PATTERN[beat];
+                playNote(bassNote, beatInterval * 4 * 0.9, 'sawtooth', 0.18);
+                // Sub bass
+                playNote(bassNote / 2, beatInterval * 4 * 0.9, 'sine', 0.12);
+            }
+
+            // === ARPEJO a cada 1/8 ===
+            if (sixteenth === 0 || sixteenth === 2) {
+                const arpIdx = (beat * 2 + (sixteenth === 2 ? 1 : 0)) % ARP_PATTERN.length;
+                const arpNote = ARP_PATTERN[arpIdx];
+                playNote(arpNote, beatInterval * 2 * 0.7, 'square', 0.05);
+                playNote(arpNote * 2, beatInterval * 2 * 0.5, 'triangle', 0.03);
+            }
+
+            // === LEAD (acordes) a cada compasso ===
+            if (stepInBeat === 0) {
+                const chord = LEAD_PATTERN[beat];
+                chord.forEach((note, i) => {
+                    setTimeout(() => playNote(note, 0.5, 'sawtooth', 0.06), i * 30);
+                    setTimeout(() => playNote(note * 2, 0.5, 'triangle', 0.03), i * 30);
+                });
+            }
+
+            stepIndex++;
+            musicScheduler = setTimeout(musicTick, beatInterval * 1000);
+        }
+
+        function playKick(intensity = 1) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const now = audioCtx.currentTime;
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+            gain.gain.setValueAtTime(intensity * 0.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+            osc.connect(gain);
+            gain.connect(masterGain);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        }
+
+        function playSnare() {
+            if (!audioCtx) return;
+            // Tom + ruído
+            const bufferSize = audioCtx.sampleRate * 0.15;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1);
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const gain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.value = 1800;
+            const now = audioCtx.currentTime;
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(masterGain);
+            noise.start(now);
+            noise.stop(now + 0.2);
+            // Tom do snare
+            playNote(200, 0.05, 'triangle', 0.15);
+        }
+
+        function startMusic() {
+            initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            musicRunning = true;
+            stepIndex = 0;
+            currentBPM = 120;
+            targetBPM = 120;
+            musicTick();
+        }
+
+        function stopMusic() {
+            musicRunning = false;
+            if (musicScheduler) { clearTimeout(musicScheduler); musicScheduler = null; }
+        }
+
+        const ROAD_WIDTH = 14;
+        const SEGMENT_LENGTH = 40;
+        const NUM_SEGMENTS = 12;
+        const LANES = [-3.5, 0, 3.5];
+        const PLAYER_ACCEL = 80;
+        const PLAYER_DECEL = 60;
+        const PLAYER_MAX_SPEED = 180;
+        const LATERAL_SPEED = 35;
+
+        const gameOverlay = document.getElementById('game-overlay');
+        const gameStartScreen = document.getElementById('gameStartScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const gameHud = document.getElementById('gameHud');
+        const gameControls = document.getElementById('gameControls');
+        const exitGameBtn = document.getElementById('exitGameBtn');
+        const speedValueEl = document.getElementById('speedValue');
+        const scoreValueEl = document.getElementById('scoreValue');
+        const distanceValueEl = document.getElementById('distanceValue');
+        const finalScoreEl = document.getElementById('finalScore');
+
+        function startGame() {
+            gameOverlay.classList.add('active');
+            document.body.classList.add('game-mode');
+            gameStartScreen.style.display = 'flex';
+            gameOverScreen.classList.remove('active');
+            gameHud.style.display = 'none';
+            gameControls.style.display = 'none';
+            exitGameBtn.style.display = 'none';
+            initScene();
+        }
+
+        function exitGame() {
+            gameOverlay.classList.remove('active');
+            document.body.classList.remove('game-mode');
+            gameState = 'idle';
+            stopMusic();
+            cleanupScene();
+        }
+
+        document.getElementById('exitGameBtn').addEventListener('click', exitGame);
+        document.getElementById('exitBtn').addEventListener('click', exitGame);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && gameState !== 'idle') exitGame();
+        });
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            gameStartScreen.style.display = 'none';
+            gameOverScreen.classList.remove('active');
+            gameHud.style.display = 'block';
+            gameControls.style.display = 'block';
+            exitGameBtn.style.display = 'block';
+            resetGame();
+            gameState = 'playing';
+            startMusic();
+            if (!clock) clock = new THREE.Clock();
+            animate();
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            gameOverScreen.classList.remove('active');
+            resetGame();
+            gameState = 'playing';
+            startMusic();
+        });
+
+        function resetGame() {
+            playerX = 0;
+            playerVelocity = 0;
+            playerLateralVelocity = 0;
+            score = 0;
+            distance = 0;
+            spawnTimer = 0;
+            boostSpeed = 0;
+            gameTime = 0;
+            // limpa obstáculos antigos
+            obstacles.forEach(o => scene && scene.remove(o.mesh));
+            obstacles = [];
+            particles.forEach(p => scene && scene.remove(p.mesh));
+            particles = [];
+        }
+
+        function initScene() {
+            if (scene) return; // já inicializado
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050010);
+            scene.fog = new THREE.Fog(0x050010, 80, 280);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 6, 14);
+            camera.lookAt(0, 1, 0);
+
+            renderer = new THREE.WebGLRenderer({
+                canvas: document.getElementById('game-canvas'),
+                antialias: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Luzes neon
+            const ambient = new THREE.AmbientLight(0x330066, 0.6);
+            scene.add(ambient);
+            const dirLight = new THREE.DirectionalLight(0xff00ff, 0.4);
+            dirLight.position.set(10, 20, 10);
+            scene.add(dirLight);
+            const cyanLight = new THREE.PointLight(0x00ffff, 2, 100);
+            cyanLight.position.set(0, 10, -50);
+            scene.add(cyanLight);
+
+            // Grid de estrelas/horizonte
+            const starsGeo = new THREE.BufferGeometry();
+            const starsCount = 2000;
+            const positions = new Float32Array(starsCount * 3);
+            for (let i = 0; i < starsCount; i++) {
+                positions[i*3]   = (Math.random() - 0.5) * 800;
+                positions[i*3+1] = Math.random() * 200 + 20;
+                positions[i*3+2] = (Math.random() - 0.5) * 800;
+            }
+            starsGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7, transparent: true, opacity: 0.8 });
+            scene.add(new THREE.Points(starsGeo, starsMat));
+
+            // Montanhas distantes
+            for (let i = 0; i < 30; i++) {
+                const side = i % 2 === 0 ? -1 : 1;
+                const mountainGeo = new THREE.ConeGeometry(20 + Math.random() * 30, 40 + Math.random() * 30, 4);
+                const mountainMat = new THREE.MeshBasicMaterial({
+                    color: side < 0 ? 0x0a0020 : 0x150030,
+                    wireframe: false
+                });
+                const mountain = new THREE.Mesh(mountainGeo, mountainMat);
+                mountain.position.set(side * (60 + Math.random() * 40), 0, -i * 30 - Math.random() * 20);
+                scene.add(mountain);
+            }
+
+            // Pista - segmentos
+            for (let i = 0; i < NUM_SEGMENTS; i++) {
+                const segment = createRoadSegment(i);
+                segment.position.z = -i * SEGMENT_LENGTH;
+                scene.add(segment);
+                roadSegments.push(segment);
+            }
+
+            // Carro do jogador
+            playerCar = createPlayerCar();
+            scene.add(playerCar);
+
+            clock = new THREE.Clock();
+        }
+
+        function createRoadSegment(index) {
+            const group = new THREE.Group();
+
+            // Asfalto
+            const roadGeo = new THREE.PlaneGeometry(ROAD_WIDTH, SEGMENT_LENGTH);
+            const roadMat = new THREE.MeshStandardMaterial({
+                color: 0x111111,
+                metalness: 0.8,
+                roughness: 0.4
+            });
+            const road = new THREE.Mesh(roadGeo, roadMat);
+            road.rotation.x = -Math.PI / 2;
+            road.position.y = 0;
+            group.add(road);
+
+            // Linha central tracejada (neon cyan)
+            for (let j = 0; j < 4; j++) {
+                const dashGeo = new THREE.PlaneGeometry(0.3, 4);
+                const dashMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+                const dash = new THREE.Mesh(dashGeo, dashMat);
+                dash.rotation.x = -Math.PI / 2;
+                dash.position.set(0, 0.02, -SEGMENT_LENGTH/2 + j * 10 + 2);
+                group.add(dash);
+                roadMarkings.push({ mesh: dash, parent: group });
+            }
+
+            // Bordas laterais neon
+            for (let side = -1; side <= 1; side += 2) {
+                const edgeGeo = new THREE.BoxGeometry(0.3, 0.5, SEGMENT_LENGTH);
+                const edgeMat = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+                const edge = new THREE.Mesh(edgeGeo, edgeMat);
+                edge.position.set(side * (ROAD_WIDTH/2 + 0.2), 0.25, 0);
+                group.add(edge);
+
+                // Glow line acima
+                const glowGeo = new THREE.PlaneGeometry(0.1, SEGMENT_LENGTH);
+                const glowMat = new THREE.MeshBasicMaterial({ color: 0xff00ff, transparent: true, opacity: 0.6 });
+                const glow = new THREE.Mesh(glowGeo, glowMat);
+                glow.position.set(side * (ROAD_WIDTH/2 + 0.2), 0.6, 0);
+                group.add(glow);
+            }
+
+            // Grid lines no chão (perspectiva synthwave)
+            for (let g = 0; g < 5; g++) {
+                const gridGeo = new THREE.PlaneGeometry(ROAD_WIDTH, 0.05);
+                const gridMat = new THREE.MeshBasicMaterial({ color: 0x4400aa, transparent: true, opacity: 0.5 });
+                const grid = new THREE.Mesh(gridGeo, gridMat);
+                grid.rotation.x = -Math.PI / 2;
+                grid.position.set(0, 0.01, -SEGMENT_LENGTH/2 + g * 8);
+                group.add(grid);
+            }
+
+            return group;
+        }
+
+        function createPlayerCar() {
+            const car = new THREE.Group();
+
+            // Corpo
+            const bodyGeo = new THREE.BoxGeometry(2, 0.6, 4);
+            const bodyMat = new THREE.MeshStandardMaterial({
+                color: 0xff0050,
+                metalness: 0.9,
+                roughness: 0.2,
+                emissive: 0xff0050,
+                emissiveIntensity: 0.3
+            });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 0.6;
+            car.add(body);
+
+            // Cabine
+            const cabinGeo = new THREE.BoxGeometry(1.6, 0.5, 2);
+            const cabinMat = new THREE.MeshStandardMaterial({
+                color: 0x220022,
+                metalness: 0.7,
+                roughness: 0.1,
+                emissive: 0x00ffff,
+                emissiveIntensity: 0.5
+            });
+            const cabin = new THREE.Mesh(cabinGeo, cabinMat);
+            cabin.position.set(0, 1.1, -0.3);
+            car.add(cabin);
+
+            // Rodas
+            const wheelGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.3, 16);
+            const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+            const wheels = [
+                [-1, 0.3, 1.3], [1, 0.3, 1.3],
+                [-1, 0.3, -1.3], [1, 0.3, -1.3]
+            ];
+            wheels.forEach(([x, y, z]) => {
+                const w = new THREE.Mesh(wheelGeo, wheelMat);
+                w.rotation.z = Math.PI / 2;
+                w.position.set(x, y, z);
+                car.add(w);
+            });
+
+            // Faróis traseiros (luzes de freio)
+            const tailGeo = new THREE.BoxGeometry(1.8, 0.2, 0.1);
+            const tailMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const tail = new THREE.Mesh(tailGeo, tailMat);
+            tail.position.set(0, 0.7, 2.05);
+            car.add(tail);
+
+            // Glow embaixo do carro
+            const underGlowGeo = new THREE.PlaneGeometry(2.5, 4.5);
+            const underGlowMat = new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                transparent: true,
+                opacity: 0.4
+            });
+            const underGlow = new THREE.Mesh(underGlowGeo, underGlowMat);
+            underGlow.rotation.x = -Math.PI / 2;
+            underGlow.position.y = 0.02;
+            car.add(underGlow);
+
+            return car;
+        }
+
+        function createObstacle() {
+            const types = [
+                { w: 2, h: 1.2, d: 4, color: 0xff00ff, name: 'car' },
+                { w: 1.5, h: 2, d: 1.5, color: 0x00ff00, name: 'pillar' },
+                { w: 3, h: 1.5, d: 2, color: 0xffff00, name: 'barrel' }
+            ];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const group = new THREE.Group();
+
+            const geo = new THREE.BoxGeometry(type.w, type.h, type.d);
+            const mat = new THREE.MeshStandardMaterial({
+                color: type.color,
+                emissive: type.color,
+                emissiveIntensity: 0.5,
+                metalness: 0.7,
+                roughness: 0.3
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.y = type.h / 2;
+            group.add(mesh);
+
+            // Wireframe neon por cima
+            const wireGeo = new THREE.BoxGeometry(type.w * 1.05, type.h * 1.05, type.d * 1.05);
+            const wireMat = new THREE.MeshBasicMaterial({
+                color: type.color,
+                wireframe: true
+            });
+            const wire = new THREE.Mesh(wireGeo, wireMat);
+            wire.position.y = type.h / 2;
+            group.add(wire);
+
+            // Posição aleatória em lane
+            const lane = LANES[Math.floor(Math.random() * LANES.length)];
+            group.position.set(lane, 0, -NUM_SEGMENTS * SEGMENT_LENGTH);
+
+            return { mesh: group, width: type.w, depth: type.d, lane: lane };
+        }
+
+        function spawnParticles(x, y, z, color) {
+            for (let i = 0; i < 12; i++) {
+                const geo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+                const mat = new THREE.MeshBasicMaterial({ color: color });
+                const p = new THREE.Mesh(geo, mat);
+                p.position.set(x, y, z);
+                p.userData.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 8,
+                    Math.random() * 5 + 2,
+                    (Math.random() - 0.5) * 8
+                );
+                p.userData.life = 1.0;
+                scene.add(p);
+                particles.push({ mesh: p, velocity: p.userData.velocity, life: 1.0 });
+            }
+        }
+
+        function checkCollision() {
+            const playerBox = {
+                minX: playerX - 1,
+                maxX: playerX + 1,
+                minZ: 0 - 2,
+                maxZ: 0 + 2
+            };
+            for (let obs of obstacles) {
+                if (Math.abs(obs.mesh.position.z) > 10) continue;
+                const ox = obs.mesh.position.x;
+                const oz = obs.mesh.position.z;
+                if (Math.abs(playerX - ox) < (obs.width / 2 + 1) &&
+                    Math.abs(oz) < (obs.depth / 2 + 2)) {
+                    return obs;
+                }
+            }
+            return null;
+        }
+
+        function gameOver() {
+            gameState = 'over';
+            finalScoreEl.textContent = Math.floor(score);
+            gameOverScreen.classList.add('active');
+            gameHud.style.display = 'none';
+            gameControls.style.display = 'none';
+            // Som de crash
+            if (audioCtx) {
+                playNoise(0.4, 0.5);
+                playNote(80, 0.5, 'sawtooth', 0.3);
+            }
+            // Para a música principal, deixa só o ruído do crash
+            setTimeout(() => stopMusic(), 300);
+        }
+
+        const keys = {};
+        window.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+            if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(e.key.toLowerCase()) ||
+                e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+            }
+        });
+        window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+
+        function animate() {
+            if (gameState === 'idle') return;
+            requestAnimationFrame(animate);
+            const dt = Math.min(clock.getDelta(), 0.05);
+            gameTime += dt;
+
+            if (gameState !== 'playing') {
+                renderer.render(scene, camera);
+                return;
+            }
+
+            // Aceleração / desaceleração
+            const accel = (keys['arrowup'] || keys['w']) ? PLAYER_ACCEL :
+                          (keys['arrowdown'] || keys['s']) ? -PLAYER_DECEL : 0;
+            playerVelocity += accel * dt;
+            playerVelocity = Math.max(0, Math.min(PLAYER_MAX_SPEED, playerVelocity));
+
+            // Boost
+            const boosting = keys[' '] && playerVelocity > 30;
+            if (boosting) {
+                playerVelocity = Math.min(PLAYER_MAX_SPEED * 1.4, playerVelocity + 60 * dt);
+                boostSpeed = 1;
+                if (Math.random() > 0.5) {
+                    spawnParticles(playerX, 0.2, 1.5, 0x00ffff);
+                }
+            } else {
+                boostSpeed *= 0.92;
+            }
+
+            // === Música reativa: BPM e filtro mudam com velocidade/boost ===
+            if (musicRunning && audioCtx) {
+                const speedRatio = playerVelocity / PLAYER_MAX_SPEED;
+                targetBPM = 110 + speedRatio * 50 + (boosting ? 25 : 0);
+                currentBPM += (targetBPM - currentBPM) * dt * 2;
+                const targetFreq = 600 + speedRatio * 3000 + (boosting ? 1500 : 0);
+                lowpassFilter.frequency.value += (targetFreq - lowpassFilter.frequency.value) * dt * 3;
+            }
+
+            // Lateral
+            const lateralInput = (keys['arrowleft'] || keys['a'] ? -1 : 0) +
+                                (keys['arrowright'] || keys['d'] ? 1 : 0);
+            playerLateralVelocity += lateralInput * LATERAL_SPEED * dt * 5;
+            playerLateralVelocity *= 0.85; // atrito
+            playerX += playerLateralVelocity * dt;
+            if (playerX < -ROAD_WIDTH/2 + 1) { playerX = -ROAD_WIDTH/2 + 1; playerLateralVelocity = 0; }
+            if (playerX > ROAD_WIDTH/2 - 1) { playerX = ROAD_WIDTH/2 - 1; playerLateralVelocity = 0; }
+
+            // Move pista (cinto sem fim)
+            const moveSpeed = playerVelocity * dt;
+            roadZ += moveSpeed;
+            if (roadZ > SEGMENT_LENGTH) roadZ -= SEGMENT_LENGTH;
+
+            roadSegments.forEach((seg, i) => {
+                seg.position.z = -i * SEGMENT_LENGTH + (roadZ % SEGMENT_LENGTH);
+                if (seg.position.z > SEGMENT_LENGTH) seg.position.z -= NUM_SEGMENTS * SEGMENT_LENGTH;
+            });
+
+            // Move player car visual
+            playerCar.position.x = playerX;
+            playerCar.position.z = 0;
+            // Inclinação em curvas
+            playerCar.rotation.z = -playerLateralVelocity * 0.02;
+            playerCar.rotation.x = boosting ? -0.05 : 0;
+            // Slight bounce
+            playerCar.position.y = Math.sin(gameTime * 8) * 0.03;
+
+            // Câmera shake no boost
+            camera.position.x = playerX * 0.3 + Math.sin(gameTime * 10) * boostSpeed * 0.2;
+            camera.position.y = 6 + Math.sin(gameTime * 5) * 0.1;
+            camera.position.z = 14;
+            camera.lookAt(playerX * 0.5, 1, 0);
+
+            // Spawn obstáculos
+            spawnTimer += dt;
+            const spawnInterval = Math.max(0.6, 2 - playerVelocity / 100);
+            if (spawnTimer > spawnInterval) {
+                spawnTimer = 0;
+                const obs = createObstacle();
+                scene.add(obs.mesh);
+                obstacles.push(obs);
+            }
+
+            // Atualiza obstáculos
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                obs.mesh.position.z += moveSpeed;
+                obs.mesh.rotation.y += dt * 0.5;
+                if (obs.mesh.position.z > 30) {
+                    scene.remove(obs.mesh);
+                    obstacles.splice(i, 1);
+                    score += 10;
+                }
+            }
+
+            // Colisão
+            if (checkCollision()) {
+                spawnParticles(playerX, 0.5, 0, 0xff0050);
+                gameOver();
+            }
+
+            // Partículas
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.velocity.y -= 15 * dt;
+                p.mesh.position.x += p.velocity.x * dt;
+                p.mesh.position.y += p.velocity.y * dt;
+                p.mesh.position.z += p.velocity.z * dt;
+                p.life -= dt * 1.5;
+                p.mesh.scale.setScalar(Math.max(0.1, p.life));
+                if (p.life <= 0) {
+                    scene.remove(p.mesh);
+                    particles.splice(i, 1);
+                }
+            }
+
+            // Pontuação
+            distance += moveSpeed * 0.1;
+            score += dt * 5 * (1 + playerVelocity / 100);
+
+            // Atualiza HUD
+            speedValueEl.textContent = Math.floor(playerVelocity * 3.6);
+            scoreValueEl.textContent = Math.floor(score);
+            distanceValueEl.textContent = Math.floor(distance);
+
+            renderer.render(scene, camera);
+        }
+
+        function cleanupScene() {
+            if (renderer) {
+                renderer.dispose();
+                renderer = null;
+            }
+            scene = null;
+            camera = null;
+            clock = null;
+            roadSegments = [];
+            obstacles = [];
+            particles = [];
+            playerCar = null;
+        }
+
+        // Resize
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+    </script>
+</body>
+</html>
